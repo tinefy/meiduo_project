@@ -110,9 +110,6 @@ ENV/
 env.bak/
 venv.bak/
 
-.idea
-test.py
-
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -130,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+.idea
+/main.py
+/test.py
