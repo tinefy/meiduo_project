@@ -9,4 +9,6 @@ class RegisterView(View):
         return render(request, 'register.html')
 
     def post(self, request):
+        username=request.POST.get('username')
+        print(username)
         return render(request, 'register.html')

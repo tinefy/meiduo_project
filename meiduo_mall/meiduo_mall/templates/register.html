@@ -23,7 +23,7 @@
         <a href="login.html">登录</a>
       </div>
       <div class="reg_form clearfix">
-        <form method="post" class="register_form" v-on:submit="on_submit" v-cloak>
+        <form method="post" class="register_form" v-on:submit="on_submit($event)" v-cloak>
           {{ csrf_input }}
           <ul>
             <li>
@@ -62,6 +62,9 @@
               <input type="checkbox" v-model="allow" v-on:change="check_allow" name="allow" id="allow">
               <label>同意”美多商城用户使用协议“</label>
               <span class="error_tip" v-show="error_allow">请勾选用户协议</span>
+            </li>
+            <li>
+              <span class="error_tip" v-show="error_submit">提交失败！</span>
             </li>
             <li class="reg_sub">
               <input type="submit" value="注 册">
