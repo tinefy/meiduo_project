@@ -1,3 +1,6 @@
+import re
+
+from django.http import HttpResponseForbidden
 from django.shortcuts import render
 
 # Create your views here.
@@ -9,6 +12,24 @@ class RegisterView(View):
         return render(request, 'register.html')
 
     def post(self, request):
-        username=request.POST.get('username')
-        print(username)
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+        mobile = request.POST.get('mobile')
+        allow = request.POST.get('allow')
+        print(allow)
+        infoList=[username,password,password2,mobile,allow]
+        if not all(infoList):
+            return HttpResponseForbidden('缺少必传参数！')
+        if not re.match(r'^[a-zA-Z0-9_-]{5,20}$', username):
+            return HttpResponseForbidden('请输入5-20个字符的用户名！')
+        if not re.match(r'^[0-9A-Za-z]{8,20}$', password):
+            return HttpResponseForbidden('请输入8-20位的密码！')
+        if password!=password2:
+            return HttpResponseForbidden('两次输入的密码不一致！')
+        if allow!='on':
+            return HttpResponseForbidden('请勾选用户协议！')
+
+
+
         return render(request, 'register.html')

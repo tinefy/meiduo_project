@@ -71,7 +71,6 @@ let vm = new Vue({
                 this.error_submit = true;
                 event.preventDefault();
             }
-
         },
     },
 });
