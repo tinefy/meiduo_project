@@ -1,9 +1,11 @@
 import re
 
+from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
+from django.urls import reverse
 from django.views import View
 
 
@@ -18,18 +20,21 @@ class RegisterView(View):
         mobile = request.POST.get('mobile')
         allow = request.POST.get('allow')
         print(allow)
-        infoList=[username,password,password2,mobile,allow]
+        infoList = [username, password, password2, mobile, allow]
         if not all(infoList):
             return HttpResponseForbidden('缺少必传参数！')
         if not re.match(r'^[a-zA-Z0-9_-]{5,20}$', username):
             return HttpResponseForbidden('请输入5-20个字符的用户名！')
         if not re.match(r'^[0-9A-Za-z]{8,20}$', password):
             return HttpResponseForbidden('请输入8-20位的密码！')
-        if password!=password2:
+        if password != password2:
             return HttpResponseForbidden('两次输入的密码不一致！')
-        if allow!='on':
+        if allow != 'on':
             return HttpResponseForbidden('请勾选用户协议！')
+        try:
+            User.objects.create_user(username=username, password=password, mobile=mobile)
+        except:
+            return render(request, 'register.html', {'register_errmsg': '注册失败！'})
+        else:
+            return redirect(reverse('contents:index'))
 
-
-
-        return render(request, 'register.html')

@@ -65,6 +65,9 @@
             </li>
             <li>
               <span class="error_tip" v-show="error_submit">提交失败！</span>
+              {% if register_errmsg %}
+              <span class="error_tip">{{ register_errmsg }}</span>
+              {% endif %}
             </li>
             <li class="reg_sub">
               <input type="submit" value="注 册">
