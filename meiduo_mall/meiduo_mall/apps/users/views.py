@@ -1,12 +1,14 @@
 import re
-
-from django.contrib.auth.models import User
-from django.http import HttpResponseForbidden
+# from django.contrib.auth.models import User
+from django.http import HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model
 
 # Create your views here.
 from django.urls import reverse
 from django.views import View
+
+User = get_user_model()
 
 
 class RegisterView(View):
@@ -19,9 +21,8 @@ class RegisterView(View):
         password2 = request.POST.get('password2')
         mobile = request.POST.get('mobile')
         allow = request.POST.get('allow')
-        print(allow)
-        infoList = [username, password, password2, mobile, allow]
-        if not all(infoList):
+        info_list = [username, password, password2, mobile, allow]
+        if not all(info_list):
             return HttpResponseForbidden('缺少必传参数！')
         if not re.match(r'^[a-zA-Z0-9_-]{5,20}$', username):
             return HttpResponseForbidden('请输入5-20个字符的用户名！')
