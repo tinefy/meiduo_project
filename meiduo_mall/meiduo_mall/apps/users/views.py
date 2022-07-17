@@ -2,7 +2,7 @@ import re
 # from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
 
 # Create your views here.
 from django.urls import reverse
@@ -33,9 +33,9 @@ class RegisterView(View):
         if allow != 'on':
             return HttpResponseForbidden('请勾选用户协议！')
         try:
-            User.objects.create_user(username=username, password=password, mobile=mobile)
+            user = User.objects.create_user(username=username, password=password, mobile=mobile)
         except:
             return render(request, 'register.html', {'register_errmsg': '注册失败！'})
         else:
+            login(request, user)
             return redirect(reverse('contents:index'))
-
