@@ -1,12 +1,14 @@
 import re
 # from django.contrib.auth.models import User
-from django.http import HttpResponseForbidden, HttpResponse
+from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login
 
 # Create your views here.
 from django.urls import reverse
 from django.views import View
+
+from meiduo_mall.utils.response_code import RETCODE
 
 User = get_user_model()
 
@@ -39,3 +41,14 @@ class RegisterView(View):
         else:
             login(request, user)
             return redirect(reverse('contents:index'))
+
+
+class UsernameCountView(View):
+    def get(self, request, username):
+        count = User.objects.filter(username=username).count()
+        json_ = {
+            'code': RETCODE.OK,
+            'errmsg': 'OK',
+            'count': count
+        }
+        return JsonResponse(json_)

@@ -27,6 +27,23 @@ let vm = new Vue({
                 this.error_name = true;
                 this.error_name_message = '请输入5-20个字符的用户名';
             }
+            let url = '/usernames/' + this.username + '/count/';
+            axios.get(
+                url, {responseType: 'json'}
+            ).then(
+                response => {
+                    if (response.data.count == 1) {
+                        this.error_name_message = '用户名已存在！';
+                        this.error_name = true;
+                    } else {
+                        this.error_name = false;
+                    }
+                }
+            ).catch(
+                error => {
+                    console.log(error.response)
+                }
+            )
         },
         check_password: function () {
             let re = /^[\w\d]{8,20}$/;
