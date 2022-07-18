@@ -1,17 +1,10 @@
-1、Vue.js v-cloak指令
+<script>
 
-1）、使用背景
+then((resp) => {
+  console.log(resp);
+  alert("登录成功");
+  that.dialogFormVisible = false;
+}).catch(function (error) {
+})
 
-    当网络受阻或页面加载完毕而没有初始化得到 Vue 实例时，DOM 中的 {{}} 则会展示出来，此时就会出现页面闪烁的问题。
-    为了防止此现象，可以使用 CSS 配合 Vue v-cloak 指令实现获取 Vue 实例前的隐藏。和 CSS 规则如 [v-cloak] { display: none } 一起用时，这个指令可以隐藏未编译的 Mustache 标签直到实例准备完毕。
-
-2）、语法
-
-[v-cloak] {
-	display: none;
-}
-<div v-cloak>
-	{{ message }}
-</div>
-
-    以上代码，当 <div> 未编译结束时，<div> 标签不会显示，只有<div>编译完成时，<div> 标签才会被正常显示出来。
+</script>
