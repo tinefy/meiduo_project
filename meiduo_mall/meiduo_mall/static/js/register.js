@@ -5,15 +5,21 @@ let vm = new Vue({
         username: 'mduser',
         password: 'mduser123',
         password2: 'mduser123',
-        mobile: '13811723356',
+        mobile: '18674115441',
         allow: 'true',
 
         uuid: '',
         image_code_url: '',
         image_code_text: '',
         image_code: '',
-        error_image_code: '',
+        error_image_code: false,
         error_image_code_message: '',
+
+        sms_code: '',
+        error_sms_code: false,
+        error_sms_code_message: '',
+        sending_flag: false,
+        sms_code_tip: '获取短信验证码',
 
         error_name: false,
         error_password: false,
@@ -96,13 +102,6 @@ let vm = new Vue({
                 }
             )
         },
-        check_allow: function () {
-            if (this.allow) {
-                this.error_allow = false;
-            } else {
-                this.error_allow = true;
-            }
-        },
         generate_image_code: function () {
             this.uuid = generateUUID();
             let url = '/image_codes/' + this.uuid + '/';
@@ -130,6 +129,72 @@ let vm = new Vue({
                     this.error_image_code_message = '验证码错误！';
                     this.error_image_code = true;
                 }
+            }
+        },
+        send_sms_code: function () {
+            if (this.sending_flag) {
+                return;
+            }
+            this.sending_flag = true;
+            this.check_mobile();
+            this.check_image_code();
+            if (this.error_mobile || this.error_image_code) {
+                this.sending_flag = false;
+                return;
+            }
+            let url = '/sms_code/' + this.mobile + '/?image_code=' + this.image_code + '&' + 'uuid=' + this.uuid;
+            axios.get(
+                url, {responseType: 'json'}
+            ).then(
+                response => {
+                    if (response.data.code == '0') {
+                        let num = 60;
+                        let t = setInterval(() => {
+                            if (num == 0) {
+                                clearInterval(t);
+                                this.sms_code_tip = '获取短信验证码';
+                                this.sending_flag = false;
+                            } else {
+                                this.sms_code_tip = num + ' 秒';
+                                num -= 1;
+                            }
+                        }, 1000);
+                    } else {
+                        if (response.data.code == '4008') {
+                            this.error_sms_code_message = response.data.errmsg;
+                            this.error_sms_code = true;
+                        } else if (response.data.code == '4001') {
+                            this.error_image_code_message = response.data.errmsg;
+                            this.error_image_code = true;
+                        } else {
+                            this.error_sms_code_message = response.data.errmsg;
+                            this.error_sms_code = true;
+                        }
+                        this.generate_image_code();
+                        this.sending_flag = false;
+                    }
+                }
+            ).catch(
+                error => {
+                    console.log(error.response);
+                    this.sending_flag = false;
+                }
+            )
+        },
+        check_sms_code: function () {
+            let re = /^\d{4}$/;
+            if (re.test(this.sms_code)) {
+                this.error_sms_code = false;
+            } else {
+                this.error_sms_code_message = '请填写短信验证码';
+                this.error_sms_code = true;
+            }
+        },
+        check_allow: function () {
+            if (this.allow) {
+                this.error_allow = false;
+            } else {
+                this.error_allow = true;
             }
         },
         on_submit: function (event) {
