@@ -22,12 +22,18 @@ class ImageCodeView(View):
         text, image = captcha.generate_captcha()
         redis_conn = get_redis_connection('verify_code')
         redis_conn.setex(f'img_{uuid}', constants.IMAGE_CODE_REDIS_EXPIRES, text)
-        image_base64 = base64.b64encode(image).decode()
-        json_ = {
-            'image': image_base64,
-            'text': text,
-        }
-        return JsonResponse(json_)
+        return HttpResponse(image, content_type='image/jpg')
+
+
+class CheckImageCodeView(View):
+    def get(self, request, uuid, text):
+        redis_conn = get_redis_connection('verify_code')
+        image_code_text = redis_conn.get(f'img_{uuid}')
+        image_code_text = image_code_text.decode()
+        if image_code_text.lower() == text.lower():
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '图形验证码正确'})
+        else:
+            return JsonResponse({'code': RETCODE.IMAGECODEERR, 'errmsg': '图形验证码错误'})
 
 
 class SMSCodeView(View):

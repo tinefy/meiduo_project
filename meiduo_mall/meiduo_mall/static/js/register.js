@@ -105,30 +105,30 @@ let vm = new Vue({
         generate_image_code: function () {
             this.uuid = generateUUID();
             let url = '/image_codes/' + this.uuid + '/';
-            axios.get(
-                url, {responseType: 'json'}
-            ).then(
-                response => {
-                    this.image_code_url = 'data:image/jpeg;base64,' + response.data.image;
-                    this.image_code_text = response.data.text;
-                }
-            ).catch(
-                error => {
-                    console.log(error.response)
-                }
-            )
+            this.image_code_url = '/image_codes/' + this.uuid + '/';
         },
         check_image_code: function () {
             if (!this.image_code) {
                 this.error_image_code_message = '请填写图片验证码';
                 this.error_image_code = true;
             } else {
-                if (this.image_code.toLowerCase() == this.image_code_text.toLowerCase()) {
-                    this.error_image_code = false;
-                } else {
-                    this.error_image_code_message = '验证码错误！';
-                    this.error_image_code = true;
-                }
+                let url = '/image_codes/' + this.uuid + '/' + this.image_code + '/';
+                axios.get(
+                    url, {contentType: 'json'}
+                ).then(
+                    response => {
+                        if (response.data.code == '0') {
+                            this.error_image_code = false;
+                        } else {
+                            this.error_image_code_message = '验证码错误！';
+                            this.error_image_code = true;
+                        }
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response);
+                    }
+                )
             }
         },
         send_sms_code: function () {
