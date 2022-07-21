@@ -183,11 +183,27 @@ let vm = new Vue({
         },
         check_sms_code: function () {
             let re = /^\d{4}$/;
-            if (re.test(this.sms_code)) {
-                this.error_sms_code = false;
-            } else {
+            if (!re.test(this.sms_code)) {
                 this.error_sms_code_message = '请填写短信验证码';
                 this.error_sms_code = true;
+            } else {
+                let url = '/sms_code/' + this.mobile + '/' + this.sms_code + '/';
+                axios.get(
+                    url, {responseType: 'json'}
+                ).then(
+                    response => {
+                        if (response.data.code == '0') {
+                            this.error_sms_code = false;
+                        } else {
+                            this.error_sms_code_message = response.data.errmsg;
+                            this.error_sms_code = true;
+                        }
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response)
+                    }
+                )
             }
         },
         check_allow: function () {

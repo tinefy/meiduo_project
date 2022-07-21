@@ -61,3 +61,17 @@ class SMSCodeView(View):
             return JsonResponse({'code': RETCODE.OK, 'errmsg': '发送短信成功！'})
         else:
             return JsonResponse({'code': RETCODE.SMSCODERR, 'errmsg': '发送短信失败！'})
+
+
+class CheckSMSCodeView(View):
+    def get(self, request, mobile, text):
+        print(mobile,text)
+        redis_conn = get_redis_connection('verify_code')
+        sms_code_server = redis_conn.get(f'sms_{mobile}')
+        sms_code_server = sms_code_server.decode()
+        if sms_code_server == text:
+            print('ok')
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '短信验证正确！'})
+        else:
+            print('ng')
+            return JsonResponse({'code': RETCODE.SMSCODERR, 'errmsg': '短信验证错误！'})
