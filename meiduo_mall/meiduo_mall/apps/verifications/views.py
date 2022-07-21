@@ -56,9 +56,11 @@ class SMSCodeView(View):
             return JsonResponse({'code': RETCODE.THROTTLINGERR, 'errmsg': '发送短信过于频繁'})
         sms_code = '%04d' % random.randint(0, 9999)
         logger.info(sms_code)
-        redis_conn.setex(f'sms_{mobile}', constants.SMS_CODE_REDIS_EXPIRES, sms_code)
         result = CCP().send_template_sms(mobile, (sms_code, constants.SMS_CODE_REDIS_EXPIRES // 60), 1)
-        redis_conn.setex(f'send_flag_{mobile}', constants.SEND_SMS_CODE_INTERVAL, 1)
+        redis_pl=redis_conn.pipeline()
+        redis_pl.setex(f'sms_{mobile}', constants.SMS_CODE_REDIS_EXPIRES, sms_code)
+        redis_pl.setex(f'send_flag_{mobile}', constants.SEND_SMS_CODE_INTERVAL, 1)
+        redis_pl.execute()
         if result == 0:
             return JsonResponse({'code': RETCODE.OK, 'errmsg': '发送短信成功！'})
         else:
