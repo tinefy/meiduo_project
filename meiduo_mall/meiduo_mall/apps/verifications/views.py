@@ -57,7 +57,12 @@ class SMSCodeView(View):
         sms_code = '%04d' % random.randint(0, 9999)
         logger.info(sms_code)
         result = CCP().send_template_sms(mobile, (sms_code, constants.SMS_CODE_REDIS_EXPIRES // 60), 1)
-        redis_pl=redis_conn.pipeline()
+        # def send_sms(a, b, c):
+        #     result = CCP().send_template_sms(a, b, c)
+        #     print('Send_SMS:', b[0], result)
+        # send_sms_process = Process(target=send_sms, args=(mobile, (sms_code, constants.SMS_CODE_REDIS_EXPIRES // 60), 1))
+        # send_sms_process.start()
+        redis_pl = redis_conn.pipeline()
         redis_pl.setex(f'sms_{mobile}', constants.SMS_CODE_REDIS_EXPIRES, sms_code)
         redis_pl.setex(f'send_flag_{mobile}', constants.SEND_SMS_CODE_INTERVAL, 1)
         redis_pl.execute()
