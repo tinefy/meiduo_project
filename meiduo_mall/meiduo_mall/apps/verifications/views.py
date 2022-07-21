@@ -51,10 +51,14 @@ class SMSCodeView(View):
             logger.error(error)
         if image_code_client.lower() != image_code_server.lower():
             return JsonResponse({'code': RETCODE.IMAGECODEERR, 'errmsg': '输入图形验证码有误'})
+        send_flag = redis_conn.get(f'send_flag_{mobile}')
+        if send_flag:
+            return JsonResponse({'code': RETCODE.THROTTLINGERR, 'errmsg': '发送短信过于频繁'})
         sms_code = '%04d' % random.randint(0, 9999)
         logger.info(sms_code)
         redis_conn.setex(f'sms_{mobile}', constants.SMS_CODE_REDIS_EXPIRES, sms_code)
         result = CCP().send_template_sms(mobile, (sms_code, constants.SMS_CODE_REDIS_EXPIRES // 60), 1)
+        redis_conn.setex(f'send_flag_{mobile}', constants.SEND_SMS_CODE_INTERVAL, 1)
         if result == 0:
             return JsonResponse({'code': RETCODE.OK, 'errmsg': '发送短信成功！'})
         else:
@@ -63,12 +67,12 @@ class SMSCodeView(View):
 
 class CheckSMSCodeView(View):
     def get(self, request, mobile, text):
-        result=self.check_sms_code(mobile, text)
-        if result==0:
+        result = self.check_sms_code(mobile, text)
+        if result == 0:
             return JsonResponse({'code': RETCODE.OK, 'errmsg': '短信验证正确！'})
-        elif result==-1:
+        elif result == -1:
             return JsonResponse({'code': RETCODE.SMSCODERR, 'errmsg': '短信验证错误！'})
-        elif result==-2:
+        elif result == -2:
             return JsonResponse({'code': RETCODE.SMSCODERR, 'errmsg': '短信验证过期！'})
 
     def check_sms_code(self, mobile, text):
