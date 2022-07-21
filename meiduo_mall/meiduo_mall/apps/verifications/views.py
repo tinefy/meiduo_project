@@ -1,10 +1,8 @@
-import base64
 import logging
 import random
 
 from django.http import JsonResponse, HttpResponse
 from django_redis import get_redis_connection
-from django.shortcuts import render
 from django.views import View
 
 from verifications.libs.captcha.captcha import captcha
@@ -65,13 +63,21 @@ class SMSCodeView(View):
 
 class CheckSMSCodeView(View):
     def get(self, request, mobile, text):
-        print(mobile,text)
+        result=self.check_sms_code(mobile, text)
+        if result==0:
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '短信验证正确！'})
+        elif result==-1:
+            return JsonResponse({'code': RETCODE.SMSCODERR, 'errmsg': '短信验证错误！'})
+        elif result==-2:
+            return JsonResponse({'code': RETCODE.SMSCODERR, 'errmsg': '短信验证过期！'})
+
+    def check_sms_code(self, mobile, text):
         redis_conn = get_redis_connection('verify_code')
         sms_code_server = redis_conn.get(f'sms_{mobile}')
         sms_code_server = sms_code_server.decode()
-        if sms_code_server == text:
-            print('ok')
-            return JsonResponse({'code': RETCODE.OK, 'errmsg': '短信验证正确！'})
+        if sms_code_server is None:
+            return -2
+        elif sms_code_server == text:
+            return 0
         else:
-            print('ng')
-            return JsonResponse({'code': RETCODE.SMSCODERR, 'errmsg': '短信验证错误！'})
+            return -1
