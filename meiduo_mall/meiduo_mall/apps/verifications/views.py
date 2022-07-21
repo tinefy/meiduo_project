@@ -11,6 +11,8 @@ from verifications.libs.ronglian_sms_sdk.SendMessage import CCP
 
 from . import constants
 
+from celery_tasks.sms.tasks import send_sms_code
+
 # Create your views here.
 logger = logging.getLogger('django')
 
@@ -62,6 +64,8 @@ class SMSCodeView(View):
         #     print('Send_SMS:', b[0], result)
         # send_sms_process = Process(target=send_sms, args=(mobile, (sms_code, constants.SMS_CODE_REDIS_EXPIRES // 60), 1))
         # send_sms_process.start()
+        # #
+        # send_sms_code.delay(mobile, sms_code)
         redis_pl = redis_conn.pipeline()
         redis_pl.setex(f'sms_{mobile}', constants.SMS_CODE_REDIS_EXPIRES, sms_code)
         redis_pl.setex(f'send_flag_{mobile}', constants.SEND_SMS_CODE_INTERVAL, 1)
