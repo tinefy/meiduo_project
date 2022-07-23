@@ -9,7 +9,7 @@ from django.views import View
 from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.apps.verifications.views import CheckSMSCodeView
 
-from meiduo_mall.apps.users.utils import UsernameMobileAuthBackend
+# from meiduo_mall.apps.users.utils import UsernameMobileAuthBackend
 
 # Create your views here.
 User = get_user_model()
@@ -90,8 +90,8 @@ class LoginView(View):
             return HttpResponseForbidden('请输入正确的用户名或手机号')
         if not re.match(r'^[\w\d]{8,20}$', password):
             return HttpResponseForbidden('密码最少8位，最长20位')
-        user = UsernameMobileAuthBackend().authenticate(username=username, password=password)
-        # user = authenticate(username=username, password=password)
+        # user = UsernameMobileAuthBackend().authenticate(username=username, password=password)
+        user = authenticate(username=username, password=password)
         if not user:
             return render(request, 'login.html', {'account_errmsg': '用户名或密码错误'})
         login(request, user=user)
