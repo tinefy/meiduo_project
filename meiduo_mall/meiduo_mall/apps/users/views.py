@@ -50,7 +50,9 @@ class RegisterView(View):
             return render(request, 'register.html', {'register_errmsg': '注册失败！'})
         else:
             login(request, user)
-            return redirect(reverse('contents:index'))
+            response = redirect(reverse('contents:index'))
+            response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
+            return response
 
 
 class UsernameCountView(View):
@@ -99,4 +101,6 @@ class LoginView(View):
             request.session.set_expiry(0)
         else:
             request.session.set_expiry(None)
-        return redirect(reverse('contents:index'))
+        response = redirect(reverse('contents:index'))
+        response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
+        return response

@@ -4,11 +4,11 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
   <title>美多商城-首页</title>
-  <link rel="stylesheet" type="text/css" href="{{ static('') }}">
-  <link rel="stylesheet" type="text/css" href="{{ static('') }}">
-  <script type="text/javascript" src="{{ static('') }}"></script>
-  <script type="text/javascript" src="{{ static('') }}"></script>
-  <script type="text/javascript" src="{{ static('') }}"></script>
+  <link rel="stylesheet" type="text/css" href="{{ static('css/reset.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ static('css/main.css') }}">
+  <script type="text/javascript" src="{{ static('js/jquery-1.12.4.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static('js/vue-2.5.16.js') }}"></script>
+  <script type="text/javascript" src="{{ static('js/axios-0.18.0.min.js') }}"></script>
 </head>
 <body>
 <div id="app">
@@ -21,9 +21,9 @@
           <a href="javascript:;" class="quit">退出</a>
         </div>
         <div class="login_btn fl">
-          <a href="login.html">登录</a>
+          <a href="login/">登录</a>
           <span>|</span>
-          <a href="register.html">注册</a>
+          <a href="register/">注册</a>
         </div>
         <div class="user_link fl">
           <span>|</span>
@@ -283,7 +283,7 @@
       <a href="#" class="advs"><img src="../static/images/adv01.jpg"></a>
     </div>
   </div>
-  <div class="floor_adv"
+  <div class="floor_adv">
   <div class="list_model">
     <div class="list_title clearfix">
       <h3 class="fl" id="model01">1F 手机通讯</h3>
@@ -765,8 +765,8 @@
   <p>电话：010-****888 京ICP备*******8号</p>
 </div>
 </div>
-<script type="text/javascript" src="{{ static('') }}"></script>
-<script type="text/javascript" src="{{ static('') }}"></script>
-<script type="text/javascript" src="{{ static('') }}"></script>
+<script type="text/javascript" src="{{ static('js/common.js') }}"></script>
+<script type="text/javascript" src="{{ static('js/slide.js') }}"></script>
+<script type="text/javascript" src="{{ static('js/index.js') }}"></script>
 </body>
 </html>
