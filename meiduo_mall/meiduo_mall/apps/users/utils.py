@@ -2,13 +2,15 @@ import re
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
+
 # from .models import User
 
 User = get_user_model()
+
+
 class UsernameMobileAuthBackend(ModelBackend):
     def authenticate(self, request=None, username=None, password=None, **kwargs):
         user = self.get_user_by_account(username)
-        print('authenticate', user)
         if user and user.check_password(password):
             return user
 
@@ -22,7 +24,6 @@ class UsernameMobileAuthBackend(ModelBackend):
             except User.DoesNotExist:
                 return None
             else:
-                print('mobile', user)
                 return user
         else:
             username = account
@@ -31,7 +32,4 @@ class UsernameMobileAuthBackend(ModelBackend):
             except User.DoesNotExist:
                 return None
             else:
-                print('username', user)
                 return user
-
-
