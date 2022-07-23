@@ -24,15 +24,20 @@
       <div class="form_con">
         <div class="form_input cur">
           <form method="post" v-on:submit="on_submit($event)" class="login-form" v-cloak>
-            <input type="text" v-model="username" v-on:blur="check_username" name="username" class="name_input" placeholder="请输入用户名或手机号">
+            {{ csrf_input }}
+            <input type="text" v-model="username" v-on:blur="check_username" name="username" class="name_input"
+                   placeholder="请输入用户名或手机号">
             <div class="user_error" v-show="err_username">请输入正确的用户名或手机号</div>
-            <input type="password" v-model="password" v-on:blur="check_password" name="password" class="pass_input" placeholder="请输入密码">
+            <input type="password" v-model="password" v-on:blur="check_password" name="password" class="pass_input"
+                   placeholder="请输入密码">
             <div class="pwd_error" v-show="err_password">密码最少8位，最长20位</div>
-            <div class="pwd_error"></div>
             <div class="more_input clearfix">
               <input type="checkbox" v-model="remembered" name="remembered">
               <label>记住登录</label>
             </div>
+            {% if account_errmsg %}
+            <div class="">{{ account_errmsg }}</div>
+            {% endif %}
             <input type="submit" value="登 录" class="input_submit">
           </form>
         </div>

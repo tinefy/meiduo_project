@@ -13,14 +13,26 @@ let vm = new Vue(
         methods: {
             check_username: function () {
                 let re = /^[\w\d_-]{5,20}$/;
-
+                if (re.test(this.username)) {
+                    this.err_username = false;
+                } else {
+                    this.err_username = true;
+                }
             },
             check_password: function () {
                 let re = /^[\w\d]{8,20}$/;
-
+                if (re.test(this.password)) {
+                    this.err_password = false;
+                } else {
+                    this.err_password = true;
+                }
             },
-            on_submit:function (event){
-                event.preventDefault()
+            on_submit: function (event) {
+                this.check_username();
+                this.check_password();
+                if (this.err_username || this.err_password){
+                    event.preventDefault()
+                }
             },
         },
     }

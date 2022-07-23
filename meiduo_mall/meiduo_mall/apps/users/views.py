@@ -2,7 +2,7 @@ import re
 # from django.contrib.auth.models import User
 from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import get_user_model, login, authenticate
 from django.urls import reverse
 from django.views import View
 
@@ -75,6 +75,21 @@ class MobileCountView(View):
 
 class LoginView(View):
     def get(self, request):
-        return render(request,'login.html')
+        return render(request, 'login.html')
+
     def post(self, request):
-        pass
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        remembered = request.POST.get('remembered')
+        necessary_info_list = [username, password]
+        if not all(necessary_info_list):
+            return HttpResponseForbidden('缺少必传参数')
+        if not re.match(r'^[\w\d_-]{5,20}$', username):
+            return HttpResponseForbidden('请输入正确的用户名或手机号')
+        if not re.match(r'^[\w\d]{8,20}$', password):
+            return HttpResponseForbidden('密码最少8位，最长20位')
+        user = authenticate(username=username, password=password)
+        print(user)
+        if not user:
+            return render(request, 'login.html', {'account_errmsg': '用户名或密码错误'})
+        return redirect(reverse('contents:index'))
