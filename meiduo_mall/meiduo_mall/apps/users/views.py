@@ -89,7 +89,11 @@ class LoginView(View):
         if not re.match(r'^[\w\d]{8,20}$', password):
             return HttpResponseForbidden('密码最少8位，最长20位')
         user = authenticate(username=username, password=password)
-        print(user)
         if not user:
             return render(request, 'login.html', {'account_errmsg': '用户名或密码错误'})
+        login(request, user=user)
+        if remembered!='on':
+            request.session.set_expiry(0)
+        else:
+            request.session.set_expiry(None)
         return redirect(reverse('contents:index'))
