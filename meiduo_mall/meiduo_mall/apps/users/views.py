@@ -83,6 +83,7 @@ class LoginView(View):
         return render(request, 'login.html')
 
     def post(self, request):
+        next_ = request.GET.get('next')
         username = request.POST.get('username')
         password = request.POST.get('password')
         remembered = request.POST.get('remembered')
@@ -102,7 +103,10 @@ class LoginView(View):
             request.session.set_expiry(0)
         else:
             request.session.set_expiry(None)
-        response = redirect(reverse('contents:index'))
+        if next_:
+            response = redirect(next_)
+        else:
+            response = redirect(reverse('contents:index'))
         response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
         return response
 
