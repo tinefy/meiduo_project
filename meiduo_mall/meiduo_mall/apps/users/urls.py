@@ -9,4 +9,5 @@ urlpatterns = [
     re_path(r'^mobiles/(?P<mobile>1[3-9]\d{9})/count/$', views.MobileCountView.as_view(), name='mobiles'),
     re_path(r'^login/$', views.LoginView.as_view(), name='login'),
     re_path(r'^logout/$', views.LogoutView.as_view(), name='logout'),
+    re_path(r'^userinfo/$', views.UserInfoView.as_view(), name='userinfo'),
 ]
