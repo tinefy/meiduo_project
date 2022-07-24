@@ -210,3 +210,4 @@ LOGGING = {
 # Django用户模型类是通过全局配置项 AUTH_USER_MODEL 决定的配置规则：AUTH_USER_MODEL = '应用名.模型类名'
 AUTH_USER_MODEL = 'users.User'
 AUTHENTICATION_BACKENDS = ['users.utils.UsernameMobileAuthBackend']
+LOGIN_URL = '/login/'

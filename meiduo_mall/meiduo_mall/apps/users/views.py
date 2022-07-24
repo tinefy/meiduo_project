@@ -1,5 +1,6 @@
 import re
 # from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, authenticate, logout
@@ -114,9 +115,12 @@ class LogoutView(View):
         return response
 
 
-class UserInfoView(View):
+class UserInfoView(LoginRequiredMixin, View):
+    # login_url = '/login/'
+    # redirect_field_name = 'redirect_to'
     def get(self, request):
-        if request.user.is_authenticated:
-            return render(request, 'user_center_info.html')
-        else:
-            return redirect(reverse('users:login'))
+        # if request.user.is_authenticated:
+        #     return render(request, 'user_center_info.html')
+        # else:
+        #     return redirect(reverse('users:login'))
+        return render(request, 'user_center_info.html')
