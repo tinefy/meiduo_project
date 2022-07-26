@@ -18,11 +18,12 @@ class OAuthGitHub(object):
     def get_github_url(self, *args):
         print(self.__getattribute__('login'))
         print(getattr(self, 'login'))
-        data = {
-            'client_id': self.client_id,
-            # 'state': self.state,
-            'allow_signup': self.allow_signup
-        }
+        data={}
+        for item in args:
+            if hasattr(self,item):
+                data[item]=getattr(self,item)
+            else:
+                print(f'OAuthGitHub中没有{item}属性，已忽略')
         url = 'https://github.com/login/oauth/authorize?' + urlencode(data)
         print(url)
         return url
@@ -30,4 +31,4 @@ class OAuthGitHub(object):
 
 if __name__ == '__main__':
     a = OAuthGitHub(client_id='d8b3fafc3117d57cdeff', )
-    a.get_github_url()
+    a.get_github_url('client_id','allow_signup')
