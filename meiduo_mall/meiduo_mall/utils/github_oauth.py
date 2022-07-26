@@ -1,5 +1,4 @@
-# from urllib.parse import urlencode
-from django.utils.http import urlencode
+from urllib.parse import urlencode
 
 
 class OAuthGitHub(object):
@@ -16,9 +15,9 @@ class OAuthGitHub(object):
         self.state = state
         self.allow_signup = allow_signup
 
-    def get_github_url(self,*args):
+    def get_github_url(self, *args):
         print(self.__getattribute__('login'))
-        print(getattr(self,'login'))
+        print(getattr(self, 'login'))
         data = {
             'client_id': self.client_id,
             # 'state': self.state,
@@ -29,8 +28,6 @@ class OAuthGitHub(object):
         return url
 
 
-
 if __name__ == '__main__':
-    a =OAuthGitHub(client_id='d8b3fafc3117d57cdeff',)
+    a = OAuthGitHub(client_id='d8b3fafc3117d57cdeff', )
     a.get_github_url()
-
