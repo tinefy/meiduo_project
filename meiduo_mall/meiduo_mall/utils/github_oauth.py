@@ -43,9 +43,10 @@ class OAuthGitHub(object):
     def get_github_access_token(self, accept='json', *args):
         data = self.parameters(*args)
         headers = {}
-        if accept == 'json':
-            headers['Accept'] = 'application/json'
-        self.url = 'https://github.com/login/oauth/access_token?'
+        if accept != 'json':
+            print('返回数据"Accept"目前只支持"application/json"')
+        headers['Accept'] = 'application/json'
+        self.url = 'https://github.com/login/oauth/access_token'
         response = post(self.url, data=data, headers=headers)
         content = json.loads(response.content.decode())
         self.access_token = content['access_token']
