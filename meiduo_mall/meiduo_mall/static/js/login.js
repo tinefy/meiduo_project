@@ -30,9 +30,25 @@ let vm = new Vue(
             on_submit: function (event) {
                 this.check_username();
                 this.check_password();
-                if (this.err_username || this.err_password){
+                if (this.err_username || this.err_password) {
                     event.preventDefault()
                 }
+            },
+            github_login: function () {
+                let next = get_query_string('next') || '/';
+                console.log(next)
+                let url = 'http://127.0.0.1:8000/github/login/?next=' + next;
+                axios.get(
+                    url,{responseType:'json'}
+                ).then(
+                    response=>{
+                        location.href=response.data.login_url;
+                    }
+                ).catch(
+                    error=>{
+                        console.log(error.response)
+                    }
+                )
             },
         },
     }

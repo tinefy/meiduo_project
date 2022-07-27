@@ -7,7 +7,7 @@ function getCookie(name) {
 // 提取地址栏中的查询字符串
 function get_query_string(name) {
     let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
-    let r = window.location.search.substr(1).match(reg);
+    let r = window.location.search.substring(1).match(reg);
     if (r != null) {
         return decodeURI(r[2]);
     }

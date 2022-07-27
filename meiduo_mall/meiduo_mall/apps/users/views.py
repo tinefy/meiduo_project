@@ -123,7 +123,8 @@ class LogoutView(View):
 
 class GitHubOAuthURLView(View):
     def get(self, request):
-        github = OAuthGitHub(client_id='d8b3fafc3117d57cdeff')
+        next_ = request.GET.get('next')
+        github = OAuthGitHub(client_id='d8b3fafc3117d57cdeff', state=next_)
         url = github.get_github_url()
         return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'login_url': url})
 
@@ -131,10 +132,13 @@ class GitHubOAuthURLView(View):
 class GitHubOAuthView(View):
     def get(self, request):
         code = request.GET.get('code')
+        next_ = request.GET.get('state')
+        print(next_)
         github = OAuthGitHub(client_id='d8b3fafc3117d57cdeff', client_secret='59814cab59d6d0a4a29f1c7c9942abc237337840',
                              code=code)
         github.get_github_access_token()
         github_user_info = github.get_github_user_info()
+        github_user_info['netx'] = next_
         return HttpResponse(str(github_user_info))
 
     def post(self, request):
