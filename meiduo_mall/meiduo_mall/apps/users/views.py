@@ -133,7 +133,6 @@ class GitHubOAuthView(View):
     def get(self, request):
         code = request.GET.get('code')
         next_ = request.GET.get('state')
-        print(next_)
         github = OAuthGitHub(client_id='d8b3fafc3117d57cdeff', client_secret='59814cab59d6d0a4a29f1c7c9942abc237337840',
                              code=code)
         github.get_github_access_token()

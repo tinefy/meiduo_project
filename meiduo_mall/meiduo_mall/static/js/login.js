@@ -36,8 +36,7 @@ let vm = new Vue(
             },
             github_login: function () {
                 let next = get_query_string('next') || '/';
-                console.log(next)
-                let url = 'http://127.0.0.1:8000/github/login/?next=' + next;
+                let url = '/github/login/?next=' + next;
                 axios.get(
                     url,{responseType:'json'}
                 ).then(
