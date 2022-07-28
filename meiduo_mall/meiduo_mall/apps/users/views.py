@@ -9,7 +9,6 @@ from django.views import View
 
 from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.apps.verifications.views import CheckSMSCodeView
-from meiduo_mall.utils.github_oauth import OAuthGitHub
 
 # from meiduo_mall.apps.users.utils import UsernameMobileAuthBackend
 
@@ -119,29 +118,6 @@ class LogoutView(View):
         response = redirect(reverse('contents:index'))
         response.delete_cookie('username')
         return response
-
-
-class GitHubOAuthURLView(View):
-    def get(self, request):
-        next_ = request.GET.get('next')
-        github = OAuthGitHub(client_id='d8b3fafc3117d57cdeff', state=next_)
-        url = github.get_github_url()
-        return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'login_url': url})
-
-
-class GitHubOAuthView(View):
-    def get(self, request):
-        code = request.GET.get('code')
-        next_ = request.GET.get('state')
-        github = OAuthGitHub(client_id='d8b3fafc3117d57cdeff', client_secret='59814cab59d6d0a4a29f1c7c9942abc237337840',
-                             code=code)
-        github.get_github_access_token()
-        github_user_info = github.get_github_user_info()
-        github_user_info['netx'] = next_
-        return HttpResponse(str(github_user_info))
-
-    def post(self, request):
-        pass
 
 
 class UserInfoView(LoginRequiredMixin, View):

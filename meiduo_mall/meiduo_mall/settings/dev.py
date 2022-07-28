@@ -211,3 +211,6 @@ LOGGING = {
 AUTH_USER_MODEL = 'users.User'
 AUTHENTICATION_BACKENDS = ['users.utils.UsernameMobileAuthBackend']
 LOGIN_URL = '/login/'
+
+CLIENT_ID = 'd8b3fafc3117d57cdeff'
+CLIENT_SECRET = '59814cab59d6d0a4a29f1c7c9942abc237337840'

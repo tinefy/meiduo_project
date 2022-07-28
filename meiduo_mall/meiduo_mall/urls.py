@@ -22,6 +22,7 @@ urlpatterns = [
     path('', include('users.urls', namespace='users')),
     path('', include('contents.urls', namespace='contents')),
     path('', include('verifications.urls', namespace='verifications')),
+    path('', include('oauth.urls', namespace='oauth')),
     path('favicon.ico', RedirectView.as_view(url='static/favicon.ico')),
 ]
 
