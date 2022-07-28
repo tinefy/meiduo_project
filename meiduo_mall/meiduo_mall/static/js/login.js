@@ -34,7 +34,8 @@ let vm = new Vue(
                     event.preventDefault()
                 }
             },
-            github_login: function () {
+            github_login: function (event) {
+                event.preventDefault();
                 let next = get_query_string('next') || '/';
                 let url = '/github/login/?next=' + next;
                 axios.get(
