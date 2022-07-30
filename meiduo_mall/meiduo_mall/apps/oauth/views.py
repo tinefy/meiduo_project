@@ -28,11 +28,12 @@ class GitHubOAuthView(View):
                              code=code)
         github.get_github_access_token()
         github_user_info = github.get_github_user_info()
-        github_user_info['netx'] = next_
         try:
             oauth_user = OAuthGitHubUser.objects.get(openid=github_user_info['id'])
         except OAuthGitHubUser.DoesNotExist:
-            pass
+            generate_access_token()
+            context = {}
+            return render(request, 'oauth_callback.html', context)
         else:
             github_user = oauth_user.user
             login(request, github_user)
