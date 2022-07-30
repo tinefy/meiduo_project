@@ -33,9 +33,9 @@ class GitHubOAuthView(View):
         try:
             oauth_user = OAuthGitHubUser.objects.get(openid=openid)
         except OAuthGitHubUser.DoesNotExist:
-            access_token = signing.dumps(openid)
-            # openid = signing.loads(access_token, max_age=5)
-            context = {'access_token':access_token}
+            access_token_openid = signing.dumps(openid)
+            # openid = signing.loads(access_token_openid, max_age=5)
+            context = {'access_token_openid':access_token_openid}
             return render(request, 'oauth_callback.html', context)
         else:
             github_user = oauth_user.user
