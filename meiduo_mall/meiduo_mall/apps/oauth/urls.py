@@ -1,6 +1,7 @@
 from django.urls import re_path
 
-from meiduo_mall.apps.oauth import views
+# from . import views
+from . import views
 
 app_name = 'oauth'
 

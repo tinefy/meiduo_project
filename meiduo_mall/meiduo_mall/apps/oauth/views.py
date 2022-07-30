@@ -3,10 +3,11 @@ from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.views import View
 from django.http import JsonResponse, HttpResponse
+from django.core import signing
 
 from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.utils.github_oauth import OAuthGitHub
-from meiduo_mall.apps.oauth.models import OAuthGitHubUser
+from .models import OAuthGitHubUser
 
 
 # Create your views here.
@@ -28,11 +29,13 @@ class GitHubOAuthView(View):
                              code=code)
         github.get_github_access_token()
         github_user_info = github.get_github_user_info()
+        openid = str(github_user_info['id'])
         try:
-            oauth_user = OAuthGitHubUser.objects.get(openid=github_user_info['id'])
+            oauth_user = OAuthGitHubUser.objects.get(openid=openid)
         except OAuthGitHubUser.DoesNotExist:
-            generate_access_token()
-            context = {}
+            access_token = signing.dumps(openid)
+            # openid = signing.loads(access_token, max_age=5)
+            context = {'access_token':access_token}
             return render(request, 'oauth_callback.html', context)
         else:
             github_user = oauth_user.user
