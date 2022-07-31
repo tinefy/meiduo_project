@@ -63,6 +63,9 @@
               <span class="error_tip" v-show="error_allow">请勾选用户协议</span>
             </li>
             <input type="hidden" name="access_token_openid" value="{{ access_token_openid }}">
+            {% if openid_error_message %}
+            <span class="error_tip">{{ openid_error_message }}</span>
+            {% endif %}
             <li>
               <span class="error_tip" v-show="error_submit">提交失败！</span>
               {% if register_errmsg %}
