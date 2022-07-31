@@ -34,6 +34,9 @@
               <label>密码:</label>
               <input type="password" v-model="password" v-on:blur="check_password" name="password" id="pwd">
               <span class="error_tip" v-show="error_password">请输入8-20位的密码</span>
+              {% if password_error_message %}
+              <span class="error_tip">{{ password_error_message }}</span>
+              {% endif %}
             </li>
             <li>
               <label>确认密码:</label>
@@ -68,8 +71,8 @@
             {% endif %}
             <li>
               <span class="error_tip" v-show="error_submit">提交失败！</span>
-              {% if register_errmsg %}
-              <span class="error_tip">{{ register_errmsg }}</span>
+              {% if binding_errmsg %}
+              <span class="error_tip">{{ binding_errmsg }}</span>
               {% endif %}
             </li>
             <li class="reg_sub">

@@ -2,6 +2,7 @@ import re
 
 from django.conf import settings
 from django.contrib.auth import login, get_user_model
+from django.db import DatabaseError
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
@@ -13,9 +14,9 @@ from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.utils.github_oauth import OAuthGitHub
 from .models import OAuthGitHubUser
 
-
 # Create your views here.
-User=get_user_model()
+User = get_user_model()
+
 
 class GitHubOAuthURLView(View):
     def get(self, request):
@@ -54,6 +55,7 @@ class GitHubOAuthView(View):
         sms_code = request.POST.get('sms_code')
         allow = request.POST.get('allow')
         access_token_openid = request.POST.get('access_token_openid')
+
         info_list = [password, password2, mobile, sms_code, allow, access_token_openid]
         if not all(info_list):
             return HttpResponseForbidden('缺少必传参数！')
@@ -77,19 +79,19 @@ class GitHubOAuthView(View):
             return render(request, 'oauth_callback.html', {'openid_error_message': '无效的openid！'})
 
         try:
-            user=User.objects.get(mobile=mobile)
-        # count = User.objects.filter(mobile=mobile).count()
+            user = User.objects.get(mobile=mobile)
         except User.DoesNotExist:
-            pass
-        else:
-            pass
-
-        try:
             user = User.objects.create_user(username=mobile, password=password, mobile=mobile)
-        except:
-            return render(request, 'oauth_callback.html', {'register_errmsg': '注册失败！'})
         else:
-            login(request, user)
-            response = redirect(reverse('contents:index'))
-            response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
-            return response
+            if not user.check_password(password):
+                return render(request, 'oauth_callback.html', {'password_error_message': '绑定账户%s失败！密码错误！' % mobile})
+        try:
+            OAuthGitHubUser.objects.create(openid=openid, user=user)
+        except DatabaseError:
+            return render(request, 'oauth_callback.html', {'binding_errmsg': '绑定失败！'})
+
+        login(request, user)
+        next_ = request.GET.get('state')
+        response = redirect(next_)
+        response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
+        return response
