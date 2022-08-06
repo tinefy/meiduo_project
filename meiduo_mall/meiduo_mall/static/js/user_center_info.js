@@ -15,7 +15,8 @@ let vm = new Vue(
             send_email_tip: '重新发送验证邮件',
         },
         mounted: function () {
-            var a;
+            this.email_active=(this.email_active == 'True') ? true : false;
+            this.set_email=(this.email == '') ? true : false;
         },
         methods: {
             check_email: function () {
