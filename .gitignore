@@ -132,6 +132,7 @@ dmypy.json
 /main.py
 /test.py
 /test.html
+/test.sql
 /t1.py
 /t2.py
 /t3.py

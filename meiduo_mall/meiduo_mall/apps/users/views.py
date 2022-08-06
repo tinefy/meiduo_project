@@ -9,6 +9,7 @@ from django.views import View
 
 from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.apps.verifications.views import CheckSMSCodeView
+from meiduo_mall.utils.views import LoginRequiredJSONMixin
 
 # from meiduo_mall.apps.users.utils import UsernameMobileAuthBackend
 
@@ -128,4 +129,20 @@ class UserInfoView(LoginRequiredMixin, View):
         #     return render(request, 'user_center_info.html')
         # else:
         #     return redirect(reverse('users:login'))
-        return render(request, 'user_center_info.html')
+        context = {
+            'username': request.user.username,
+            'mobile': request.user.mobile,
+            'email': request.user.email,
+            'email_active': request.user.email_active
+        }
+        return render(request, 'user_center_info.html',context=context)
+
+
+class UserEmailsView(LoginRequiredMixin, View):
+    def get(self, request):
+        pass
+
+
+class UserAddressView(LoginRequiredMixin, View):
+    def get(self, request):
+        pass
