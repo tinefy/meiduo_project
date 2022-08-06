@@ -76,13 +76,13 @@
               <div v-show="error_email" class="error_email_tip">邮箱格式错误</div>
             </div>
             <div v-else>
-              <input type="email" name="email" class="email" readonly>
+              <input v-model="email" type="email" name="email" class="email" readonly>
               <div v-if="email_active">
                 已验证
               </div>
               <div v-else>
                 待验证<input v-on:click="save_email" v-bind:disabled="send_email_btn_disabled" type="button" name=""
-                          value="send_email_tip">
+                          v-bind:value="send_email_tip">
               </div>
             </div>
           </li>

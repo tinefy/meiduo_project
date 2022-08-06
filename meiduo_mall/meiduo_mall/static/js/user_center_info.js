@@ -15,8 +15,8 @@ let vm = new Vue(
             send_email_tip: '重新发送验证邮件',
         },
         mounted: function () {
-            this.email_active=(this.email_active == 'True') ? true : false;
-            this.set_email=(this.email == '') ? true : false;
+            this.email_active = (this.email_active == 'True') ? true : false;
+            this.set_email = (this.email == '') ? true : false;
         },
         methods: {
             check_email: function () {
@@ -43,10 +43,20 @@ let vm = new Vue(
                     ).then(
                         response => {
                             if (response.data.code == '0') {
-
+                                this.set_email = false;
+                                this.send_email_tip = '已发送验证邮件';
+                                this.send_email_btn_disabled = true;
+                            } else if (response.data.code == '4101') {
+                                location.href = '/login/?next=/info/';
+                            } else {
+                                alert(response.data.errmsg);
                             }
                         }
-                    ).catch()
+                    ).catch(
+                        error => {
+                            alert(error.response);
+                        }
+                    )
                 }
             },
             cancel_email: function () {
