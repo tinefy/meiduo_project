@@ -1,0 +1,5 @@
+# 邮件验证有效期，单位：秒
+EMAIL_VERIFICATION_CODE_EXPIRES = 600
+
+# 60s内是否重复发送的标记
+SEND_EMAIL_INTERVAL = 60

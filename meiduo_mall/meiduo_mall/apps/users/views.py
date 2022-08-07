@@ -1,8 +1,15 @@
 import json
+import logging
 import re
 # from django.contrib.auth.models import User
+from multiprocessing import Process
+
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
+from django.core import signing
+from django.core.mail import send_mail
+from django.http import HttpResponseForbidden, HttpResponse, JsonResponse, HttpResponseBadRequest, \
+    HttpResponseServerError
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, authenticate, logout
 from django.urls import reverse
@@ -11,12 +18,16 @@ from django.views import View
 from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.apps.verifications.views import CheckSMSCodeView
 from meiduo_mall.utils.views import LoginRequiredJSONMixin
+from meiduo_mall.apps.users import constants
 
 # from meiduo_mall.apps.users.utils import UsernameMobileAuthBackend
 
 # Create your views here.
 
+
 User = get_user_model()
+
+logger = logging.Logger('django')
 
 
 class RegisterView(View):
@@ -149,11 +160,52 @@ class UserEmailsView(LoginRequiredJSONMixin, View):
         if not re.match(re_, email):
             return HttpResponseForbidden('参数email有误')
         try:
+            # request.user.email = email
+            # request.user.save()
             User.objects.filter(username=request.user.username).update(email=email)
         except Exception as e:
-            print(e)
+            logger.error(e)
             return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '添加邮箱失败'})
+
+        def generate_email_verify_url(user):
+            data_ = {'user_id': user.id, 'email': email}
+            token = signing.dumps(data_)
+            verify_url = settings.SITE_URL + reverse('users:emails_verification') + '?token=' + token
+            return verify_url
+
+        def send_mail_():
+            verify_url = generate_email_verify_url(request.user)
+            subject = "美多商城邮箱验证"
+            html_message = '<p>尊敬的用户您好！</p>' \
+                           '<p>感谢您使用美多商城。</p>' \
+                           '<p>您的邮箱为：%s 。请点击此链接激活您的邮箱：</p>' \
+                           '<p><a href="%s">%s<a></p>' % (email, verify_url, verify_url)
+            try:
+                send_mail(subject, "", settings.EMAIL_FROM, [email], html_message=html_message)
+            except Exception as e:
+                logger.error(e)
+
+        send_mail_process = Process(target=send_mail_)
+        send_mail_process.start()
         return JsonResponse({'code': RETCODE.OK, 'errmsg': '添加邮箱成功'})
+
+
+class UserEmailsVerificationView(View):
+    def get(self, request):
+        token = request.GET.get('token')
+        if not token:
+            return HttpResponseBadRequest('缺少token')
+        try:
+            data_ = signing.loads(token, max_age=constants.EMAIL_VERIFICATION_CODE_EXPIRES)
+        except Exception as e:
+            logger.error(e)
+            return HttpResponseForbidden('无效的token')
+        try:
+            User.objects.filter(id=data_['user_id'], email=data_['email']).update(email_active=True)
+        except Exception as e:
+            logger.error(e)
+            return HttpResponseServerError('激活邮件失败')
+        return redirect(reverse('users:info'))
 
 
 class UserAddressView(LoginRequiredMixin, View):

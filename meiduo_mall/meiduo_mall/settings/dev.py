@@ -217,3 +217,12 @@ CLIENT_ID = 'd8b3fafc3117d57cdeff'
 CLIENT_SECRET = '59814cab59d6d0a4a29f1c7c9942abc237337840'
 
 SIGNING_MAX_AGE = 600
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # 指定邮件后端
+EMAIL_HOST = 'mail.ifold.cf'  # 发邮件主机
+EMAIL_PORT = 25  # 发邮件端口
+EMAIL_HOST_USER = 'test@ifold.cf'  # 授权的邮箱
+EMAIL_HOST_PASSWORD = 'egMQru3cw3nGe'  # 邮箱授权时获得的密码，非注册登录密码
+EMAIL_FROM = '美多ifold<test@ifold.cf>'  # 发件人抬头
+
+SITE_URL = 'http://127.0.0.1:8000'
