@@ -60,7 +60,8 @@ let vm = new Vue(
                 }
             },
             cancel_email: function () {
-                var a;
+                this.email='';
+                this.error_email=false;
             },
         },
     }
