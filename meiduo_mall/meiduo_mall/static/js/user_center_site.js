@@ -36,10 +36,10 @@ let vm = new Vue(
                     let url = '/areas/';
                     this.provinces = this.get_areas(url).province_list
                 } else if (area == 'city') {
-                    let url = '/areas/?city=' + this.form_address.province_id;
+                    let url = '/areas/?area_id=' + this.form_address.province_id;
                     this.cities = this.get_areas(url).sub_data.subs
                 } else if (area == 'district') {
-                    let url = '/areas/?city=' + this.form_address.city_id;
+                    let url = '/areas/?area_id=' + this.form_address.city_id;
                     this.districts = this.get_areas(url).sub_data.subs
                 }
             },
