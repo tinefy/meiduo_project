@@ -28,10 +28,27 @@ let vm = new Vue(
                 e.preventDefault();
                 this.is_show_editor = false;
             },
-            get_provinces: function () {
+            get_provinces: function (area) {
+                if (area == 'province') {
+
+                } else if (area == 'city') {
+
+                } else if (area == 'district') {
+
+                }
+                let url = '/areas/';
+            },
+            get_areas: function (url) {
 
             },
         },
-        watch: {}
+        watch: {
+            'form_address.province_id': function () {
+                let url = '';
+            },
+            'form_address.city_id': function () {
+                let url = '';
+            },
+        },
     }
 )
