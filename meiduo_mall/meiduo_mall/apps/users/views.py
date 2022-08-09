@@ -210,4 +210,4 @@ class UserEmailsVerificationView(View):
 
 class UserAddressView(LoginRequiredMixin, View):
     def get(self, request):
-        pass
+        return render(request, 'user_center_site.html')
