@@ -18,11 +18,12 @@ from django.urls import path, include
 from django.views.generic import RedirectView
 
 urlpatterns = [
+    path('favicon.ico', RedirectView.as_view(url='static/favicon.ico')),
     path('admin/', admin.site.urls),
     path('', include('users.urls', namespace='users')),
     path('', include('contents.urls', namespace='contents')),
     path('', include('verifications.urls', namespace='verifications')),
     path('', include('oauth.urls', namespace='oauth')),
-    path('favicon.ico', RedirectView.as_view(url='static/favicon.ico')),
+    path('', include('areas.urls', namespace='areas')),
 ]
 
