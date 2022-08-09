@@ -19,6 +19,9 @@ let vm = new Vue(
             districts: [],
             is_show_editor: false,
         },
+        mounted: function () {
+            this.get_areas_data('province')
+        },
         methods: {
             show_editor: function (e) {
                 e.preventDefault();
@@ -28,26 +31,40 @@ let vm = new Vue(
                 e.preventDefault();
                 this.is_show_editor = false;
             },
-            get_provinces: function (area) {
+            get_areas_data: function (area) {
                 if (area == 'province') {
-
+                    let url = '/areas/';
+                    this.provinces = this.get_areas(url).province_list
                 } else if (area == 'city') {
-
+                    let url = '/areas/?city=' + this.form_address.province_id;
+                    this.cities = this.get_areas(url).sub_data.subs
                 } else if (area == 'district') {
-
+                    let url = '/areas/?city=' + this.form_address.city_id;
+                    this.districts = this.get_areas(url).sub_data.subs
                 }
-                let url = '/areas/';
             },
             get_areas: function (url) {
-
+                let data_;
+                axios.get(
+                    url, {responseType: 'json'}
+                ).then(
+                    response => {
+                        data_ = response.data;
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response);
+                    }
+                )
+                return data_;
             },
         },
         watch: {
             'form_address.province_id': function () {
-                let url = '';
+                this.get_areas_data('city')
             },
             'form_address.city_id': function () {
-                let url = '';
+                this.get_areas_data('district')
             },
         },
     }
