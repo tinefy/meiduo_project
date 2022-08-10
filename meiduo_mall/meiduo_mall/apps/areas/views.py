@@ -15,6 +15,7 @@ class AreasView(View):
     def get(self, request):
         area_id = request.GET.get('area_id')
         if not area_id:
+            # 如果
             try:
                 province_model_list = Area.objects.filter(parent__isnull=True)
             except Exception as e:
@@ -26,4 +27,25 @@ class AreasView(View):
                     province_list.append({'id': province_model.id, 'name': province_model.name})
                 return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'province_list': province_list})
         else:
-            pass
+            try:
+                province_model = Area.objects.get(id__exact=area_id)
+                sub_model_list = Area.objects.filter(parent__exact=area_id)
+            except Exception as e:
+                logger.error(e)
+                print(e)
+                return JsonResponse({'code': RETCODE.DBERR, 'errmsg': 'xx数据错误'})
+            else:
+                subs = []
+                for sub_model in sub_model_list:
+                    subs.append({'id': sub_model.id, 'name': sub_model.name})
+                return JsonResponse(
+                    {
+                        'code': RETCODE.OK,
+                        'errmsg': 'OK',
+                        'sub_data': {
+                            'id': province_model.id,
+                            'name': province_model.name,
+                            'subs': subs,
+                        },
+                    }
+                )

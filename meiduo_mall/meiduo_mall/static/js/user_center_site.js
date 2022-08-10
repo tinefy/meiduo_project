@@ -29,7 +29,7 @@ let vm = new Vue(
                 this.is_show_editor = false;
             },
             get_areas: function (area) {
-                // 错误原因：axios是异步执行的，所以this.area_data还为空时就执行到下面了。
+                // 注意：axios是异步执行的
                 let url = '';
                 if (area == 'province') {
                     url = '/areas/';
@@ -45,12 +45,14 @@ let vm = new Vue(
                         if (area == 'province') {
                             this.provinces = response.data.province_list;
                             // select下拉框设定默认值
-                            this.form_address.province_id=this.provinces[0].id;
+                            this.form_address.province_id = this.provinces[0].id;
                             console.log(this.form_address.province_id);
                         } else if (area == 'city') {
                             this.cities = response.data.sub_data.subs;
+                            this.form_address.city_id = this.cities[0].id;
                         } else if (area == 'district') {
                             this.districts = response.data.sub_data.subs;
+                            this.form_address.district_id = this.districts[0].id;
                         }
                     }
                 ).catch(
