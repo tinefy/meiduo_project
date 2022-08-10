@@ -28,32 +28,33 @@ let vm = new Vue(
                 e.preventDefault();
                 this.is_show_editor = false;
             },
-            get_areas: function (url) {
-                let data_;
+            get_areas: function (area) {
+                // 错误原因：axios是异步执行的，所以this.area_data还为空时就执行到下面了。
+                let url = '';
+                if (area == 'province') {
+                    url = '/areas/';
+                } else if (area == 'city') {
+                    url = '/areas/?area_id=' + this.form_address.province_id;
+                } else if (area == 'district') {
+                    url = '/areas/?area_id=' + this.form_address.city_id;
+                }
                 axios.get(
                     url, {responseType: 'json'}
                 ).then(
                     response => {
-                        data_ = response.data;
+                        if (area == 'province') {
+                            this.provinces = response.data.province_list;
+                        } else if (area == 'city') {
+                            this.cities = response.data.sub_data.subs;
+                        } else if (area == 'district') {
+                            this.districts = response.data.sub_data.subs;
+                        }
                     }
                 ).catch(
                     error => {
                         console.log(error.response);
                     }
                 )
-                return data_;
-            },
-            get_areas_data: function (area) {
-                if (area == 'province') {
-                    let url = '/areas/';
-                    this.provinces = this.get_areas(url).province_list
-                } else if (area == 'city') {
-                    let url = '/areas/?area_id=' + this.form_address.province_id;
-                    this.cities = this.get_areas(url).sub_data.subs
-                } else if (area == 'district') {
-                    let url = '/areas/?area_id=' + this.form_address.city_id;
-                    this.districts = this.get_areas(url).sub_data.subs
-                }
             },
         },
         watch: {
