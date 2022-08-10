@@ -25,14 +25,20 @@ class AreasView(View):
                 province_list = []
                 for province_model in province_model_list:
                     province_list.append({'id': province_model.id, 'name': province_model.name})
-                return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'province_list': province_list})
+                return JsonResponse(
+                    {
+                        'code': RETCODE.OK,
+                        'errmsg': 'OK',
+                        'province_list': province_list
+                    }
+                )
         else:
             try:
                 province_model = Area.objects.get(id__exact=area_id)
-                sub_model_list = Area.objects.filter(parent__exact=area_id)
+                # sub_model_list = Area.objects.filter(parent__exact=area_id)
+                sub_model_list = province_model.subs.all()
             except Exception as e:
                 logger.error(e)
-                print(e)
                 return JsonResponse({'code': RETCODE.DBERR, 'errmsg': 'xx数据错误'})
             else:
                 subs = []
