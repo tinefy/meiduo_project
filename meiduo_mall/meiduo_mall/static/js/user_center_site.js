@@ -44,6 +44,9 @@ let vm = new Vue(
                     response => {
                         if (area == 'province') {
                             this.provinces = response.data.province_list;
+                            // select下拉框设定默认值
+                            this.form_address.province_id=this.provinces[0].id;
+                            console.log(this.form_address.province_id);
                         } else if (area == 'city') {
                             this.cities = response.data.sub_data.subs;
                         } else if (area == 'district') {
