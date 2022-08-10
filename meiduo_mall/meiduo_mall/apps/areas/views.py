@@ -15,7 +15,7 @@ class AreasView(View):
     def get(self, request):
         area_id = request.GET.get('area_id')
         if not area_id:
-            # 如果
+            # 如果area_id为空，则请求省数据
             try:
                 province_model_list = Area.objects.filter(parent__isnull=True)
             except Exception as e:
@@ -33,13 +33,14 @@ class AreasView(View):
                     }
                 )
         else:
+            # 如果area_id非空，则请求市/区数据
             try:
                 province_model = Area.objects.get(id__exact=area_id)
                 # sub_model_list = Area.objects.filter(parent__exact=area_id)
                 sub_model_list = province_model.subs.all()
             except Exception as e:
                 logger.error(e)
-                return JsonResponse({'code': RETCODE.DBERR, 'errmsg': 'xx数据错误'})
+                return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '市/区数据错误'})
             else:
                 subs = []
                 for sub_model in sub_model_list:
