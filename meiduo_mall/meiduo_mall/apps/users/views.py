@@ -211,3 +211,8 @@ class UserEmailsVerificationView(View):
 class UserAddressView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'user_center_site.html')
+
+
+class UserAddressCreateView(LoginRequiredMixin, View):
+    def post(self, request):
+        return JsonResponse({})

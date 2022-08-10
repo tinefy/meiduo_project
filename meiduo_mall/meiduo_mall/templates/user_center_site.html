@@ -63,7 +63,7 @@
     </div>
     <div class="right_content clearfix">
       <div class="site_top_con">
-        <a v-on:click="show_editor">新增收货地址</a>
+        <a href="JavaScript:;" v-on:click="show_editor">新增收货地址</a>
         <span>你已创建了<b>2</b>个收货地址，最多可创建<b>20</b>个</span>
       </div>
       <div class="site_con">
@@ -128,8 +128,8 @@
       <form>
         <div class="form_group">
           <label>*收货人：</label>
-          <input v-model="form_address.receiver" type="text" class="receiver">
-          <span class="receiver_error">请填写收件人</span>
+          <input v-model="form_address.receiver" v-on:blur="check_receiver" type="text" class="receiver">
+          <span v-show="error_receiver" class="receiver_error">请填写收件人</span>
         </div>
         <div class="form_group">
           <label>*所在地区：</label>
@@ -145,25 +145,26 @@
         </div>
         <div class="form_group">
           <label>*详细地址：</label>
-          <input v-model="form_address.place" type="text" class="place">
-          <span class="place_error">请填写地址信息</span>
+          <input v-model="form_address.place" v-on:blur="check_place" type="text" class="place">
+          <span v-show="error_place" class="place_error">请填写地址信息</span>
         </div>
         <div class="form_group">
           <label>*手机：</label>
-          <input v-model="form_address.mobile" type="text" class="mobile">
-          <span class="mobile_error">手机信息有误</span>
+          <input v-model="form_address.mobile" v-on:blur="check_mobile" type="text" class="mobile">
+          <span v-show="error_mobile" class="mobile_error">手机信息有误</span>
         </div>
         <div class="form_group">
           <label>固定电话：</label>
-          <input v-model="form_address.tel" type="text" class="tel">
-          <span class="tel_error">固定电话有误</span>
+          <input v-model="form_address.tel" v-on:blur="check_tel" type="text" class="tel">
+          <span v-show="error_tel" class="tel_error">固定电话有误</span>
         </div>
         <div class="form_group">
           <label>邮箱：</label>
-          <input v-model="form_address.email" type="text" class="email">
-          <span class="email_error">邮箱信息有误</span>
+          <input v-model="form_address.email" v-on:blur="check_email" type="text" class="email">
+          <span v-show="error_email" class="email_error">邮箱信息有误</span>
         </div>
-        <input type="button" name="" value="新 增" class="info_submit">
+        <input v-on:click="save_address($event)" type="button" name="" value="新 增" class="info_submit">
+        <input v-on:click="clear_form_data" type="reset" name="" value="清 空" class="info_submit info_reset">
         <input v-on:click="close_editor" type="reset" name="" value="取 消" class="info_submit info_reset">
       </form>
     </div>

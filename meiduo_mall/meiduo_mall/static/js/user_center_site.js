@@ -4,6 +4,7 @@ let vm = new Vue(
         delimiters: ['[[', ']]'],
         data: {
             username: getCookie('username'),
+
             form_address: {
                 receiver: '',
                 province_id: '',
@@ -18,8 +19,22 @@ let vm = new Vue(
             cities: [],
             districts: [],
             is_show_editor: false,
+            error_receiver: false,
+            error_place: false,
+            error_mobile: false,
+            error_tel: false,
+            error_email: false,
+
+            editing_address_index: -1,
         },
         methods: {
+            clear_form_data: function () {
+                let keys_ = Object.keys(this.form_address)
+                for (let i = 0; i < keys_.length; i++) {
+                    this.form_address[keys_[i]] = '';
+                }
+                this.get_areas('province');
+            },
             show_editor: function (e) {
                 e.preventDefault();
                 this.is_show_editor = true;
@@ -60,6 +75,50 @@ let vm = new Vue(
                         console.log(error.response);
                     }
                 )
+            },
+            check_receiver: function () {
+                let re = /^\s*?$/;
+                if (re.test(this.form_address.receiver)) {
+                    this.error_receiver = true;
+                } else {
+                    this.error_receiver = false;
+                }
+            },
+            check_place: function () {
+                let re = /^\s*?$/;
+                if (re.test(this.form_address.place)) {
+                    this.error_place = true;
+                } else {
+                    this.error_place = false;
+                }
+            },
+            check_mobile: function () {
+                let re = /^1[3-9]\d{9}$/;
+                if (!re.test(this.form_address.mobile)) {
+                    this.error_mobile = true;
+                } else {
+                    this.error_mobile = false;
+                }
+            },
+            check_tel: function () {
+                let re = /^(0[0-9]{2,3}-)?([2-9][0-9]{6,7})+(-[0-9]{1,4})?$/;
+                if (!re.test(this.form_address.tel)) {
+                    this.error_tel = true;
+                } else {
+                    this.error_tel = false;
+                }
+            },
+            check_email: function () {
+                let re = /^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$/;
+                if (!re.test(this.form_address.email)) {
+                    this.error_email = true;
+                } else {
+                    this.error_email = false;
+                }
+            },
+            save_address: function (e, index = -1) {
+                e.preventDefault()
+                // if ()
             },
         },
         watch: {
