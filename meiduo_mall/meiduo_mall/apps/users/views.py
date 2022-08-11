@@ -19,6 +19,7 @@ from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.apps.verifications.views import CheckSMSCodeView
 from meiduo_mall.utils.views import LoginRequiredJSONMixin
 from meiduo_mall.apps.users import constants
+from .models import Address
 
 # from meiduo_mall.apps.users.utils import UsernameMobileAuthBackend
 
@@ -210,8 +211,48 @@ class UserEmailsVerificationView(View):
 
 class UserAddressView(LoginRequiredMixin, View):
     def get(self, request):
-        addresses=Address.objects.filter()
-        return render(request, 'user_center_site.html')
+        addresses = Address.objects.filter(user=request.user, is_deleted=False)
+        '''
+        等同于 addresses = Address.objects.filter(user_id=request.user.id, is_deleted=False)
+        SQL Query:
+        SELECT `tb_address`.`id`,
+               `tb_address`.`create_time`,
+               `tb_address`.`update_time`,
+               `tb_address`.`user_id`,
+               `tb_address`.`title`,
+               `tb_address`.`receiver`,
+               `tb_address`.`province_id`,
+               `tb_address`.`city_id`,
+               `tb_address`.`district_id`,
+               `tb_address`.`place`,
+               `tb_address`.`mobile`,
+               `tb_address`.`tel`,
+               `tb_address`.`email`,
+               `tb_address`.`is_deleted`
+        FROM `tb_address`
+        WHERE (NOT `tb_address`.`is_deleted` AND `tb_address`.`user_id` = 21)
+        ORDER BY `tb_address`.`update_time` DESC LIMIT 21
+        '''
+        address_dict_list = []
+        for address in addresses:
+            address_dict = {
+                "id": address.id,
+                "title": address.title,
+                "receiver": address.receiver,
+                "province": address.province.name,
+                "city": address.city.name,
+                "district": address.district.name,
+                "place": address.place,
+                "mobile": address.mobile,
+                "tel": address.tel,
+                "email": address.email
+            }
+            address_dict_list.append(address_dict)
+        context = {
+            'default_address_id': request.user.default_address,
+            'addresses': address_dict_list,
+        }
+        return render(request, 'user_center_site.html', context=context)
 
 
 class UserAddressCreateView(LoginRequiredMixin, View):
