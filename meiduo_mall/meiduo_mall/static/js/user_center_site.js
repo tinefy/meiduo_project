@@ -26,7 +26,8 @@ let vm = new Vue(
                 error_tel: false,
                 error_email: false,
             },
-            editing_address_index: -1,
+            // editing_address_index: -1,
+            addresses:[],
         },
         methods: {
             clear_form_data: function () {
@@ -125,8 +126,44 @@ let vm = new Vue(
                 }
             },
             save_address: function (e, index = -1) {
-                e.preventDefault()
-                // if ()
+                e.preventDefault();
+                if (index == '-1') {
+                    let url = '/address/create/';
+                    axios.post(
+                        url, this.form_address, {
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            responseType: 'json',
+                        }
+                    ).then(
+                        response => {
+                            this.addresses.splice(0,0,response.data.address) ;
+                        }
+                    ).catch(
+                        error => {
+                            console.log(error.response);
+                        }
+                    )
+                } else {
+                    let url = '/address/create/';
+                    axios.post(
+                        url, this.form_address, {
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            responseType: 'json',
+                        }
+                    ).then(
+                        response => {
+                            response.data;
+                        }
+                    ).catch(
+                        error => {
+                            console.log(error.response);
+                        }
+                    )
+                }
             },
         },
         watch: {
