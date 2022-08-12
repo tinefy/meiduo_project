@@ -27,7 +27,8 @@ let vm = new Vue(
                 error_email: false,
             },
             // editing_address_index: -1,
-            addresses:[],
+            addresses:addresses,
+            default_address_id: default_address_id,
         },
         methods: {
             clear_form_data: function () {
@@ -176,6 +177,7 @@ let vm = new Vue(
         },
         mounted: function () {
             this.get_areas('province')
+            console.log(this.addresses)
         },
     }
 )

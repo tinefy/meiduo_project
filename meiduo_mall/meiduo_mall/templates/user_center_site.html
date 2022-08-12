@@ -64,9 +64,9 @@
     <div class="right_content clearfix">
       <div class="site_top_con">
         <a href="JavaScript:;" v-on:click="show_editor">新增收货地址</a>
-        <span>你已创建了<b>2</b>个收货地址，最多可创建<b>20</b>个</span>
+        <span>你已创建了<b>[[ addresses.length ]]</b>个收货地址，最多可创建<b>20</b>个</span>
       </div>
-      <div class="site_con">
+      <div class="site_con" v-for="(address,index) in addresses">
         <div class="site_title">
           <h3>传智播客 北京</h3>
           <a href="javascript"></a>
@@ -172,8 +172,10 @@
   </div>
 </div>
 <script type="text/javascript">
-  let addresses = "";
-  let default_address_id = "";
+  // @formatter:off
+  let addresses = {{ addresses | safe }};
+  let default_address_id = {{ default_address_id }};
+  // @formatter:on
 </script>
 <script type="text/javascript" src="{{ static('js/common.js') }}"></script>
 <script type="text/javascript" src="{{ static('js/user_center_site.js') }}"></script>
