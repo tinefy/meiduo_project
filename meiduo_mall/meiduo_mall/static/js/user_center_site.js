@@ -27,8 +27,13 @@ let vm = new Vue(
                 error_email: false,
             },
             // editing_address_index: -1,
-            addresses: addresses,
+
+            addresses: JSON.parse(JSON.stringify(addresses)),
+            // addresses: [{"title":"ABC",},],
             default_address_id: default_address_id == 'None' ? null : default_address_id,
+
+            edit_title_index:null,
+            new_title:'',
         },
         methods: {
             clear_form_data: function () {
@@ -165,6 +170,14 @@ let vm = new Vue(
                         }
                     )
                 }
+            },
+            save_title: function (index) {
+                // e.preventDefault();
+                this.edit_title_index;
+            },
+            cancel_title: function (index) {
+                // e.preventDefault();
+                this.new_title;
             },
         },
         watch: {
