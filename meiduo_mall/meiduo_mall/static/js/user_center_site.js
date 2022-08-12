@@ -27,8 +27,8 @@ let vm = new Vue(
                 error_email: false,
             },
             // editing_address_index: -1,
-            addresses:addresses,
-            default_address_id: default_address_id,
+            addresses: addresses,
+            default_address_id: default_address_id == 'None' ? null : default_address_id,
         },
         methods: {
             clear_form_data: function () {
@@ -139,7 +139,7 @@ let vm = new Vue(
                         }
                     ).then(
                         response => {
-                            this.addresses.splice(0,0,response.data.address) ;
+                            this.addresses.splice(0, 0, response.data.address);
                         }
                     ).catch(
                         error => {

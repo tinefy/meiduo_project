@@ -248,8 +248,15 @@ class UserAddressView(LoginRequiredMixin, View):
                 "email": address.email
             }
             address_dict_list.append(address_dict)
+
+        def default_address_id():
+            if not request.user.default_address:
+                return 'null'
+            else:
+                return request.user.default_address
+
         context = {
-            'default_address_id': request.user.default_address,
+            'default_address_id': default_address_id(),
             'addresses': address_dict_list,
         }
         return render(request, 'user_center_site.html', context=context)
