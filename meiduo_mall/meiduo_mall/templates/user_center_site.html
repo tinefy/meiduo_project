@@ -75,8 +75,8 @@
           </div>
           <h3>[[ address.title ]]</h3>
           <a v-on:click="edit_title_index=index" href="javascript:;"></a>
-          <em>默认地址</em>
-          <span class="del_site">×</span>
+          <em v-if="address.id===default_address_id">默认地址</em>
+          <span v-on:click="delete_address(index)" class="del_site">×</span>
         </div>
         <ul class="site_list">
           <li><span>收货人：</span><b>传智播客</b></li>

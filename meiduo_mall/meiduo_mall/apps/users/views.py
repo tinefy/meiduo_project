@@ -262,6 +262,10 @@ class UserAddressView(LoginRequiredMixin, View):
         return render(request, 'user_center_site.html', context=context)
 
 
-class UserAddressCreateView(LoginRequiredMixin, View):
+class UserAddressCreateView(LoginRequiredJSONMixin, View):
     def post(self, request):
-        return JsonResponse({})
+        data_dict=json.loads(request.body.decode())
+        for key,value in data_dict:
+            data_dict
+    def put(self, request):
+        pass

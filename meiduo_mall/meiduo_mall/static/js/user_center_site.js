@@ -32,8 +32,8 @@ let vm = new Vue(
             // addresses: [{"title":"ABC",},],
             default_address_id: default_address_id == 'None' ? null : default_address_id,
 
-            edit_title_index:null,
-            new_title:'',
+            edit_title_index: null,
+            new_title: '',
         },
         methods: {
             clear_form_data: function () {
@@ -133,6 +133,21 @@ let vm = new Vue(
             },
             save_address: function (e, index = -1) {
                 e.preventDefault();
+                this.check_receiver();
+                this.check_place();
+                this.check_mobile();
+                this.check_tel();
+                this.check_email();
+                let error_ = false;
+                for (let item_ of Object.keys(this.error_tips)) {
+                    if (this.error_tips[item_]) {
+                        error_ = true;
+                    }
+                }
+                if (error_) {
+                    alert('信息填写有误！');
+                    return
+                }
                 if (index == '-1') {
                     let url = '/address/create/';
                     axios.post(
@@ -145,6 +160,7 @@ let vm = new Vue(
                     ).then(
                         response => {
                             this.addresses.splice(0, 0, response.data.address);
+                            this.is_show_editor = false;
                         }
                     ).catch(
                         error => {
@@ -152,8 +168,8 @@ let vm = new Vue(
                         }
                     )
                 } else {
-                    let url = '/address/create/';
-                    axios.post(
+                    let url = '/address/' + this.addresses[this.editing_address_index].id + '/';
+                    axios.put(
                         url, this.form_address, {
                             headers: {
                                 'X-CSRFToken': getCookie('csrftoken')
@@ -162,7 +178,8 @@ let vm = new Vue(
                         }
                     ).then(
                         response => {
-                            response.data;
+                            this.addresses[this.editing_address_index] = response.data.address
+                            this.is_show_editor = false;
                         }
                     ).catch(
                         error => {
@@ -176,6 +193,10 @@ let vm = new Vue(
                 this.edit_title_index;
             },
             cancel_title: function (index) {
+                // e.preventDefault();
+                this.new_title;
+            },
+            delete_address: function (index) {
                 // e.preventDefault();
                 this.new_title;
             },
