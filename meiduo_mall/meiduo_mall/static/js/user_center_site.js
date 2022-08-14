@@ -136,8 +136,7 @@ let vm = new Vue(
                 this.check_receiver();
                 this.check_place();
                 this.check_mobile();
-                this.check_tel();
-                this.check_email();
+
                 let error_ = false;
                 for (let item_ of Object.keys(this.error_tips)) {
                     if (this.error_tips[item_]) {

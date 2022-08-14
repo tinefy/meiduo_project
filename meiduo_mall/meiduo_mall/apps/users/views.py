@@ -1,7 +1,6 @@
 import json
 import logging
 import re
-# from django.contrib.auth.models import User
 from multiprocessing import Process
 
 from django.conf import settings
@@ -14,11 +13,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, authenticate, logout
 from django.urls import reverse
 from django.views import View
+# from django.contrib.auth.models import User
 
 from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.apps.verifications.views import CheckSMSCodeView
 from meiduo_mall.utils.views import LoginRequiredJSONMixin
-from meiduo_mall.apps.users import constants
+from . import constants
 from .models import Address
 
 # from meiduo_mall.apps.users.utils import UsernameMobileAuthBackend
@@ -264,8 +264,33 @@ class UserAddressView(LoginRequiredMixin, View):
 
 class UserAddressCreateView(LoginRequiredJSONMixin, View):
     def post(self, request):
-        data_dict=json.loads(request.body.decode())
-        for key,value in data_dict:
-            data_dict
+        data_dict = json.loads(request.body.decode())
+        for key, value in data_dict.items():
+            # 将key转为变量名并让key=value
+            globals()[key] = value
+
+        # address_count = Address.objects.filter(user=request.user).count()
+        # class Address 中 user = models.ForeignKey(..., related_name='addresses', ...)
+        address_count = request.user.addresses.count()
+        if address_count >= constants.USER_ADDRESS_COUNTS_LIMIT:
+            return JsonResponse({'code': RETCODE.THROTTLINGERR, 'errmsg': '超过地址数量上限'})
+
+        necessary = [receiver, province_id, city_id, district_id, place, mobile]
+        if not all(necessary):
+            return HttpResponseForbidden('缺少必传参数')
+        if not re.match(r'^1[3-9]\d{9}$', mobile):
+            return HttpResponseForbidden('参数mobile有误')
+        if tel:
+            if not re.match(r'^(0[0-9]{2,3}-)?([2-9][0-9]{6,7})+(-[0-9]{1,4})?$', tel):
+                return HttpResponseForbidden('参数tel有误')
+        if email:
+            if not re.match(r'^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$', email):
+                return HttpResponseForbidden('参数email有误')
+
+        try:
+            address = Address.objects.create(user=request.user, title=data_dict['receiver'], **data_dict)
+        except Exception as e:
+            logger.error(e)
+
     def put(self, request):
         pass
