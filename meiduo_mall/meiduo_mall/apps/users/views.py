@@ -266,33 +266,44 @@ class UserAddressView(LoginRequiredMixin, View):
         return render(request, 'user_center_site.html', context=context)
 
 
-class UserAddressCreateView(LoginRequiredJSONMixin, View):
-    def post(self, request):
-        data_dict = json.loads(request.body.decode())
-        for key, value in data_dict.items():
+class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
+    def get_and_check_address_data_dict(self, request):
+        address_data_dict = json.loads(request.body.decode())
+        for key, value in address_data_dict.items():
             # 将key转为变量名并让key=value
             globals()[key] = value
 
+        error_flag = False
         # address_count = Address.objects.filter(user=request.user).count()
         # class Address 中 user = models.ForeignKey(User,..., related_name='addresses', ...)
         address_count = request.user.addresses.count()
         if address_count >= constants.USER_ADDRESS_COUNTS_LIMIT:
-            return JsonResponse({'code': RETCODE.THROTTLINGERR, 'errmsg': '超过地址数量上限'})
+            error_flag = True
+            return error_flag, JsonResponse({'code': RETCODE.THROTTLINGERR, 'errmsg': '超过地址数量上限'})
 
         necessary = [receiver, province_id, city_id, district_id, place, mobile]
         if not all(necessary):
-            return HttpResponseForbidden('缺少必传参数')
+            error_flag = True
+            return error_flag, HttpResponseForbidden('缺少必传参数')
         if not re.match(r'^1[3-9]\d{9}$', mobile):
-            return HttpResponseForbidden('参数mobile有误')
+            error_flag = True
+            return error_flag, HttpResponseForbidden('参数mobile有误')
         if tel:
             if not re.match(r'^(0[0-9]{2,3}-)?([2-9][0-9]{6,7})+(-[0-9]{1,4})?$', tel):
-                return HttpResponseForbidden('参数tel有误')
+                error_flag = True
+                return error_flag, HttpResponseForbidden('参数tel有误')
         if email:
             if not re.match(r'^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$', email):
-                return HttpResponseForbidden('参数email有误')
+                error_flag = True
+                return error_flag, HttpResponseForbidden('参数email有误')
+        return error_flag, address_data_dict
 
+    def post(self, request):
+        error_flag, address_data_dict = self.get_and_check_address_data_dict(request)
+        if error_flag:
+            return
         try:
-            address = Address.objects.create(user=request.user, title=receiver, **data_dict)
+            address = Address.objects.create(user=request.user, title=receiver, **address_data_dict)
         except Exception as e:
             logger.error(e)
             return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '新增地址失败'})
@@ -305,5 +316,17 @@ class UserAddressCreateView(LoginRequiredJSONMixin, View):
         address_dict = UserAddressView.address_dict(address)
         return JsonResponse({'code': RETCODE.OK, 'errmsg': '新增地址成功', 'address': address_dict})
 
-    def put(self, request):
+    def put(self, request, address_id):
+        error_flag, address_data_dict = self.get_and_check_address_data_dict(request)
+        if error_flag:
+            return
+        try:
+            Address.objects.filter(id=address_id).update(user=request.user, **address_data_dict)
+        except Exception as e:
+            print(e)
+            logger.error(e)
+        address=Address.objects.get(id=address_id)
+
+
+    def delete(self, request, address_id):
         pass

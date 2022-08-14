@@ -194,9 +194,11 @@ let vm = new Vue(
                         }
                     )
                 } else {
-                    let url = '/address/' + this.addresses[this.editing_address_index].id + '/';
+                    let url = '/address/' + this.addresses[index].id + '/';
+                    let form_address_=$.extend(true,{},this.form_address)
+                    form_address_[title]=this.addresses[index].title;
                     axios.put(
-                        url, this.form_address, {
+                        url, form_address_, {
                             headers: {
                                 'X-CSRFToken': getCookie('csrftoken')
                             },
@@ -204,7 +206,7 @@ let vm = new Vue(
                         }
                     ).then(
                         response => {
-                            this.addresses[this.editing_address_index] = response.data.address
+                            this.addresses[this.index] = response.data.address
                             this.is_show_editor = false;
                         }
                     ).catch(
