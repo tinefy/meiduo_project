@@ -12,8 +12,8 @@ let vm = new Vue(
                 district_id: '',
                 place: '北京市东城区钱粮胡同 99 号',
                 mobile: '13816769876',
-                tel: '',
-                email: '',
+                tel: '010-67678656',
+                email: 'zhangsan@163.com',
             },
             provinces: [],
             cities: [],
@@ -73,21 +73,42 @@ let vm = new Vue(
                 ).then(
                     response => {
                         if (area == 'province') {
-                            this.provinces = response.data.province_list;
-                            // select下拉框设定默认值
-                            this.form_address.province_id = this.provinces[0].id;
-                            console.log(this.form_address.province_id);
+                            if (response.data.code == '0') {
+                                this.provinces = response.data.province_list;
+                                // select下拉框设定默认值
+                                this.form_address.province_id = this.provinces[0].id;
+                            } else {
+                                console.log(response.data);
+                                this.provinces = [];
+                            }
                         } else if (area == 'city') {
-                            this.cities = response.data.sub_data.subs;
-                            this.form_address.city_id = this.cities[0].id;
+                            if (response.data.code == '0') {
+                                this.cities = response.data.sub_data.subs;
+                                this.form_address.city_id = this.cities[0].id;
+                            } else {
+                                console.log(response.data);
+                                this.cities = [];
+                            }
                         } else if (area == 'district') {
-                            this.districts = response.data.sub_data.subs;
-                            this.form_address.district_id = this.districts[0].id;
+                            if (response.data.code == '0') {
+                                this.districts = response.data.sub_data.subs;
+                                this.form_address.district_id = this.districts[0].id;
+                            } else {
+                                console.log(response.data);
+                                this.districts = [];
+                            }
                         }
                     }
                 ).catch(
                     error => {
                         console.log(error.response);
+                        if (area == 'province') {
+                            this.provinces = [];
+                        } else if (area == 'city') {
+                            this.cities = [];
+                        } else if (area == 'district') {
+                            this.districts = [];
+                        }
                     }
                 )
             },
@@ -158,8 +179,14 @@ let vm = new Vue(
                         }
                     ).then(
                         response => {
-                            this.addresses.splice(0, 0, response.data.address);
-                            this.is_show_editor = false;
+                            if (response.data.code == '0') {
+                                this.addresses.splice(0, 0, response.data.address);
+                                this.is_show_editor = false;
+                            } else if (response.data.code == '4101') {
+                                location.href = '/login/?next=/address/';
+                            } else {
+                                alert(response.data.errmsg);
+                            }
                         }
                     ).catch(
                         error => {
@@ -199,14 +226,26 @@ let vm = new Vue(
                 // e.preventDefault();
                 this.new_title;
             },
+            set_default: function (index) {
+                // e.preventDefault();
+                this.new_title;
+            },
         },
         watch: {
-            'form_address.province_id': function () {
-                this.get_areas('city');
-            },
-            'form_address.city_id': function () {
-                this.get_areas('district');
-            },
+            'form_address.province_id':
+
+                function () {
+                    this.get_areas('city');
+                }
+
+            ,
+            'form_address.city_id':
+
+                function () {
+                    this.get_areas('district');
+                }
+
+            ,
         },
         mounted: function () {
             this.get_areas('province')

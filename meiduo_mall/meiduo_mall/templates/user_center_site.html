@@ -79,40 +79,16 @@
           <span v-on:click="delete_address(index)" class="del_site">×</span>
         </div>
         <ul class="site_list">
-          <li><span>收货人：</span><b>传智播客</b></li>
-          <li><span>所在地区：</span><b>北京市昌平区</b></li>
-          <li><span>地址：</span><b>建材城西路</b></li>
-          <li><span>手机：</span><b>188****0001</b></li>
-          <li><span>固定电话：</span><b>78912345</b></li>
-          <li><span>电子邮箱：</span><b>hmmeiduo@163.com</b></li>
+          <li><span>收货人：</span><b>[[ address.receiver ]]</b></li>
+          <li><span>所在地区：</span><b>[[ address.province ]] [[ address.city ]] [[ address.district ]]</b></li>
+          <li><span>地址：</span><b>[[ address.place ]]</b></li>
+          <li><span>手机：</span><b>[[ address.mobile ]]</b></li>
+          <li><span>固定电话：</span><b>[[ address.tel ]]</b></li>
+          <li><span>电子邮箱：</span><b>[[ address.email ]]</b></li>
         </ul>
         <div class="down_btn">
+          <a v-if="address.id!=default_address_id" v-on:click="set_default(index)">设为默认</a>
           <a href="javascript:;">编辑</a>
-        </div>
-      </div>
-      <div class="site_con">
-        <div class="site_title">
-          <div v-if="edit_title_index===1">
-            <input type="text" name="">
-            <input type="button" name="" value="保 存">
-            <input type="reset" name="" value="取 消">
-          </div>
-          <h3>Test</h3>
-          <a href="javascript:;" v-on:click="edit_title_index=1"></a>
-          <em>默认地址</em>
-          <span class="del_site">×</span>
-        </div>
-        <ul class="site_list">
-          <li><span>收货人：</span><b>传智播客</b></li>
-          <li><span>所在地区：</span><b>北京市昌平区</b></li>
-          <li><span>地址：</span><b>建材城西路</b></li>
-          <li><span>手机：</span><b>188****0001</b></li>
-          <li><span>固定电话：</span><b>78912345</b></li>
-          <li><span>电子邮箱：</span><b>hmmeiduo@163.com</b></li>
-        </ul>
-        <div class="down_btn">
-          <a href="javascript">设为默认</a>
-          <a href="javascript">编辑</a>
         </div>
       </div>
     </div>

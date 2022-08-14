@@ -210,6 +210,22 @@ class UserEmailsVerificationView(View):
 
 
 class UserAddressView(LoginRequiredMixin, View):
+    @staticmethod
+    def address_dict(address):
+        address_dict = {
+            "id": address.id,
+            "title": address.title,
+            "receiver": address.receiver,
+            "province": address.province.name,
+            "city": address.city.name,
+            "district": address.district.name,
+            "place": address.place,
+            "mobile": address.mobile,
+            "tel": address.tel,
+            "email": address.email
+        }
+        return address_dict
+
     def get(self, request):
         addresses = Address.objects.filter(user=request.user, is_deleted=False)
         '''
@@ -235,25 +251,13 @@ class UserAddressView(LoginRequiredMixin, View):
         '''
         address_dict_list = []
         for address in addresses:
-            address_dict = {
-                "id": address.id,
-                "title": address.title,
-                "receiver": address.receiver,
-                "province": address.province.name,
-                "city": address.city.name,
-                "district": address.district.name,
-                "place": address.place,
-                "mobile": address.mobile,
-                "tel": address.tel,
-                "email": address.email
-            }
-            address_dict_list.append(address_dict)
+            address_dict_list.append(self.address_dict(address))
 
         def default_address_id():
             if not request.user.default_address:
                 return 'null'
             else:
-                return request.user.default_address
+                return request.user.default_address.id
 
         context = {
             'default_address_id': default_address_id(),
@@ -270,7 +274,7 @@ class UserAddressCreateView(LoginRequiredJSONMixin, View):
             globals()[key] = value
 
         # address_count = Address.objects.filter(user=request.user).count()
-        # class Address 中 user = models.ForeignKey(..., related_name='addresses', ...)
+        # class Address 中 user = models.ForeignKey(User,..., related_name='addresses', ...)
         address_count = request.user.addresses.count()
         if address_count >= constants.USER_ADDRESS_COUNTS_LIMIT:
             return JsonResponse({'code': RETCODE.THROTTLINGERR, 'errmsg': '超过地址数量上限'})
@@ -288,14 +292,18 @@ class UserAddressCreateView(LoginRequiredJSONMixin, View):
                 return HttpResponseForbidden('参数email有误')
 
         try:
-            address = Address.objects.create(user=request.user, title=data_dict['receiver'], **data_dict)
+            address = Address.objects.create(user=request.user, title=receiver, **data_dict)
         except Exception as e:
             logger.error(e)
-        else:
-            if not request.user.default_address:
-                # request.user.default_address = address
-                # request.user.save()
-                User.objects.filter(username=request.user).update(default_address=address)
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '新增地址失败'})
+
+        if not request.user.default_address:
+            # request.user.default_address = address
+            # request.user.save()
+            User.objects.filter(username=request.user).update(default_address=address)
+
+        address_dict = UserAddressView.address_dict(address)
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': '新增地址成功', 'address': address_dict})
 
     def put(self, request):
         pass
