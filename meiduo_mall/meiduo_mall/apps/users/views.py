@@ -291,6 +291,11 @@ class UserAddressCreateView(LoginRequiredJSONMixin, View):
             address = Address.objects.create(user=request.user, title=data_dict['receiver'], **data_dict)
         except Exception as e:
             logger.error(e)
+        else:
+            if not request.user.default_address:
+                # request.user.default_address = address
+                # request.user.save()
+                User.objects.filter(username=request.user).update(default_address=address)
 
     def put(self, request):
         pass

@@ -6,12 +6,12 @@ let vm = new Vue(
             username: getCookie('username'),
 
             form_address: {
-                receiver: '',
+                receiver: '张三',
                 province_id: '',
                 city_id: '',
                 district_id: '',
-                place: '',
-                mobile: '',
+                place: '北京市东城区钱粮胡同 99 号',
+                mobile: '13816769876',
                 tel: '',
                 email: '',
             },
