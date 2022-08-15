@@ -269,6 +269,8 @@ class UserAddressView(LoginRequiredMixin, View):
 class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
     def get_and_check_address_data_dict(self, request):
         address_data_dict = json.loads(request.body.decode())
+        print(address_data_dict)
+
         for key, value in address_data_dict.items():
             # 将key转为变量名并让key=value
             globals()[key] = value
@@ -300,6 +302,7 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
 
     def post(self, request):
         error_flag, address_data_dict = self.get_and_check_address_data_dict(request)
+        print(address_data_dict)
         if error_flag:
             return
         try:
@@ -318,6 +321,8 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
 
     def put(self, request, address_id):
         error_flag, address_data_dict = self.get_and_check_address_data_dict(request)
+        print(address_data_dict)
+        # address_data_dict.pop('')
         if error_flag:
             return
         try:
@@ -325,7 +330,8 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
         except Exception as e:
             print(e)
             logger.error(e)
-        address=Address.objects.get(id=address_id)
+        address = Address.objects.get(id=address_id)
+        # print(globals())
 
 
     def delete(self, request, address_id):

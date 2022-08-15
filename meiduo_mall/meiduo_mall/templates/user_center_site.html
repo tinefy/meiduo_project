@@ -64,7 +64,7 @@
     </div>
     <div class="right_content clearfix">
       <div class="site_top_con">
-        <a href="JavaScript:;" v-on:click="show_editor">新增收货地址</a>
+        <a href="JavaScript:;" v-on:click="show_editor($event)">新增收货地址</a>
         <span>你已创建了<b>[[ addresses.length ]]</b>个收货地址，最多可创建<b>5</b>个</span>
       </div>
       <div class="site_con" v-for="(address,index) in addresses">
@@ -89,7 +89,7 @@
         </ul>
         <div class="down_btn">
           <a v-if="address.id != default_address_id" v-on:click="set_default(index)">设为默认</a>
-          <a v-on:click="save_address($event,index)" href="javascript:;">编辑</a>
+          <a v-on:click="show_editor($event,index)" href="javascript:;">编辑</a>
         </div>
       </div>
     </div>

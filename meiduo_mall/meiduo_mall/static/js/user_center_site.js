@@ -26,7 +26,8 @@ let vm = new Vue(
                 error_tel: false,
                 error_email: false,
             },
-            // editing_address_index: -1,
+            editing_address_index: -1,
+            editing_address_flag: false,
 
             addresses: JSON.parse(JSON.stringify(addresses)),
             // addresses: [{"title":"ABC",},],
@@ -42,7 +43,7 @@ let vm = new Vue(
                     this.form_address[keys[i]] = '';
                 }
                 this.clear_errors();
-                this.get_areas('province');
+                // this.get_areas('province');
             },
             clear_errors: function () {
                 let keys = Object.keys(this.error_tips);
@@ -50,8 +51,45 @@ let vm = new Vue(
                     this.error_tips[keys[i]] = '';
                 }
             },
-            show_editor: function (e) {
+            show_editor: function (e, index = -1) {
                 e.preventDefault();
+                this.editing_address_index = index;
+
+                if (index !== -1) {
+                    this.editing_address_flag = true;
+                    this.clear_form_data();
+                    this.form_address = JSON.parse(JSON.stringify(this.addresses[index]));
+                    console.log(this.form_address);
+                    for (let province of this.provinces) {
+                        // console.log(province);
+                        if (province.name === this.form_address.province) {
+                            this.form_address.province_id = province.id;
+                            console.log(this.form_address.province_id);
+                        }
+                    }
+                    for (let city of this.cities) {
+                        console.log(city);
+                        if (city.name === this.form_address.city) {
+                            this.form_address.city_id = city.id;
+                            console.log(this.form_address.city_id);
+                        }
+                    }
+                    for (let district of this.districts) {
+                        // console.log(province);
+                        if (district.name === this.form_address.district) {
+                            this.form_address.district_id = district.id;
+                            console.log(this.form_address.district_id);
+                        }
+                    }
+                    // this.get_areas('province');
+                } else {
+                    this.clear_form_data();
+                    // 清空form数据时，清空了省市区默认数据，会导致引发watch中获取市区数据的方法，
+                    // 因为省市数据为空，发送的请求不正确，所以下方重新设置默认数据
+                    this.form_address.province_id = this.provinces[0].id;
+                    this.form_address.city_id = this.cities[0].id;
+                    this.form_address.district_id = this.districts[0].id;
+                }
                 this.is_show_editor = true;
             },
             close_editor: function (e) {
@@ -152,7 +190,7 @@ let vm = new Vue(
                     this.error_tips.error_email = false;
                 }
             },
-            save_address: function (e, index = -1) {
+            save_address: function (e) {
                 e.preventDefault();
                 this.check_receiver();
                 this.check_place();
@@ -166,9 +204,9 @@ let vm = new Vue(
                 }
                 if (error_) {
                     alert('信息填写有误！');
-                    return
+                    return;
                 }
-                if (index == '-1') {
+                if (this.editing_address_index === -1) {
                     let url = '/address/create/';
                     axios.post(
                         url, this.form_address, {
@@ -182,6 +220,7 @@ let vm = new Vue(
                             if (response.data.code == '0') {
                                 this.addresses.splice(0, 0, response.data.address);
                                 this.is_show_editor = false;
+                                this.clear_form_data();
                             } else if (response.data.code == '4101') {
                                 location.href = '/login/?next=/address/';
                             } else {
@@ -194,11 +233,11 @@ let vm = new Vue(
                         }
                     )
                 } else {
-                    let url = '/address/' + this.addresses[index].id + '/';
-                    let form_address_=$.extend(true,{},this.form_address)
-                    form_address_[title]=this.addresses[index].title;
+                    let url = '/address/' + this.addresses[this.editing_address_index].id + '/modify/';
+                    // let form_address_ = $.extend(true, {}, this.form_address)
+                    // form_address_[title] = this.addresses[this.editing_address_index].title;
                     axios.put(
-                        url, form_address_, {
+                        url, this.form_address, {
                             headers: {
                                 'X-CSRFToken': getCookie('csrftoken')
                             },
@@ -206,8 +245,9 @@ let vm = new Vue(
                         }
                     ).then(
                         response => {
-                            this.addresses[this.index] = response.data.address
+                            this.addresses[this.editing_address_index] = response.data.address;
                             this.is_show_editor = false;
+                            this.clear_form_data();
                         }
                     ).catch(
                         error => {
@@ -234,20 +274,16 @@ let vm = new Vue(
             },
         },
         watch: {
-            'form_address.province_id':
-
-                function () {
+            'form_address.province_id': function () {
+                if (!this.editing_address_flag) {
                     this.get_areas('city');
                 }
-
-            ,
-            'form_address.city_id':
-
-                function () {
+            },
+            'form_address.city_id': function () {
+                if (!this.editing_address_flag) {
                     this.get_areas('district');
                 }
-
-            ,
+            },
         },
         mounted: function () {
             this.get_areas('province')

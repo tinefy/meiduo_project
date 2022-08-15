@@ -15,6 +15,6 @@ urlpatterns = [
     re_path(r'^emails/verification/$', views.UserEmailsVerificationView.as_view(), name='emails_verification'),
     re_path(r'^address/$', views.UserAddressView.as_view(), name='address'),
     re_path(r'^address/create/$', views.UserAddressCreateModifyView.as_view(), name='address_create'),
-    re_path(r'^address/(?P<address_id>\d+)/modify$', views.UserAddressCreateModifyView.as_view(),
+    re_path(r'^address/(?P<address_id>\d+)/modify/$', views.UserAddressCreateModifyView.as_view(),
             name='address_modify'),
 ]
