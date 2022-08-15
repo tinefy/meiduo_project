@@ -57,32 +57,64 @@ let vm = new Vue(
 
                 if (index !== -1) {
                     this.editing_address_flag = true;
-                    this.clear_form_data();
-                    this.form_address = JSON.parse(JSON.stringify(this.addresses[index]));
-                    console.log(this.form_address);
-                    for (let province of this.provinces) {
-                        // console.log(province);
-                        if (province.name === this.form_address.province) {
-                            this.form_address.province_id = province.id;
-                            console.log(this.form_address.province_id);
-                        }
+                    // this.clear_form_data();
+                    // this.form_address = JSON.parse(JSON.stringify(this.addresses[index]));
+                    let t = JSON.parse(JSON.stringify(this.addresses[index]));
+                    // t.province_id = this.provinces[0].id;
+                    // t.city_id = this.cities[0].id;
+                    // t.district_id = this.districts[0].id;
+                    // t.province_id = '';
+                    // t.city_id = '';
+                    // t.district_id = '';
+                    // this.form_address = t;
+                    // console.log(this.form_address);
+                    let url = '/address/' + this.form_address.id + '/area/';
+                    let address_area = {
+                        province: this.form_address.province,
+                        city: this.form_address.city,
+                        district: this.form_address.district,
                     }
-                    for (let city of this.cities) {
-                        console.log(city);
-                        if (city.name === this.form_address.city) {
-                            this.form_address.city_id = city.id;
-                            console.log(this.form_address.city_id);
+                    axios.get(
+                        url, {responseType: 'json'}
+                    ).then(
+                        response => {
+                            let address_area = response.data.address_area;
+                            t.province_id = address_area.province_id;
+                            t.city_id = address_area.city_id;
+                            t.district_id = address_area.district_id;
+                            this.form_address = t
+                            console.log('1' + this.form_address.city_id);
                         }
-                    }
-                    for (let district of this.districts) {
-                        // console.log(province);
-                        if (district.name === this.form_address.district) {
-                            this.form_address.district_id = district.id;
-                            console.log(this.form_address.district_id);
+                    ).catch(
+                        error => {
+                            console.log(error.response);
                         }
-                    }
+                    )
+                    console.log(this.form_address.city_id);
+                    // for (let province of this.provinces) {
+                    //     // console.log(province);
+                    //     if (province.name === this.form_address.province) {
+                    //         this.form_address.province_id = province.id;
+                    //         console.log(this.form_address.province_id);
+                    //     }
+                    // }
+                    // for (let city of this.cities) {
+                    //     console.log(city);
+                    //     if (city.name === this.form_address.city) {
+                    //         this.form_address.city_id = city.id;
+                    //         console.log(this.form_address.city_id);
+                    //     }
+                    // }
+                    // for (let district of this.districts) {
+                    //     // console.log(province);
+                    //     if (district.name === this.form_address.district) {
+                    //         this.form_address.district_id = district.id;
+                    //         console.log(this.form_address.district_id);
+                    //     }
+                    // }
                     // this.get_areas('province');
                 } else {
+                    this.editing_address_flag = false;
                     this.clear_form_data();
                     // 清空form数据时，清空了省市区默认数据，会导致引发watch中获取市区数据的方法，
                     // 因为省市数据为空，发送的请求不正确，所以下方重新设置默认数据
@@ -114,7 +146,9 @@ let vm = new Vue(
                             if (response.data.code == '0') {
                                 this.provinces = response.data.province_list;
                                 // select下拉框设定默认值
-                                this.form_address.province_id = this.provinces[0].id;
+                                if (!this.editing_address_flag) {
+                                    this.form_address.province_id = this.provinces[0].id;
+                                }
                             } else {
                                 console.log(response.data);
                                 this.provinces = [];
@@ -122,7 +156,10 @@ let vm = new Vue(
                         } else if (area == 'city') {
                             if (response.data.code == '0') {
                                 this.cities = response.data.sub_data.subs;
-                                this.form_address.city_id = this.cities[0].id;
+                                if (!this.editing_address_flag) {
+                                    this.form_address.city_id = this.cities[0].id;
+                                }
+                                console.log(this.form_address.city_id);
                             } else {
                                 console.log(response.data);
                                 this.cities = [];
@@ -130,7 +167,10 @@ let vm = new Vue(
                         } else if (area == 'district') {
                             if (response.data.code == '0') {
                                 this.districts = response.data.sub_data.subs;
-                                this.form_address.district_id = this.districts[0].id;
+                                if (!this.editing_address_flag) {
+                                    this.form_address.district_id = this.districts[0].id;
+                                }
+                                this.editing_address_flag = false;
                             } else {
                                 console.log(response.data);
                                 this.districts = [];
@@ -275,14 +315,10 @@ let vm = new Vue(
         },
         watch: {
             'form_address.province_id': function () {
-                if (!this.editing_address_flag) {
-                    this.get_areas('city');
-                }
+                this.get_areas('city');
             },
             'form_address.city_id': function () {
-                if (!this.editing_address_flag) {
-                    this.get_areas('district');
-                }
+                this.get_areas('district');
             },
         },
         mounted: function () {

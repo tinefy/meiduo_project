@@ -300,6 +300,20 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
                 return error_flag, HttpResponseForbidden('参数email有误')
         return error_flag, address_data_dict
 
+    def get(self, request, address_id):
+        try:
+            address = Address.objects.get(id=address_id)
+        except Exception as e:
+            logger.error(e)
+        else:
+            address_area = {
+                'address_id': address_id,
+                'province_id': address.province_id,
+                'city_id': address.city_id,
+                'district_id': address.district_id,
+            }
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '新增地址成功', 'address_area': address_area})
+
     def post(self, request):
         error_flag, address_data_dict = self.get_and_check_address_data_dict(request)
         print(address_data_dict)
@@ -332,7 +346,6 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
             logger.error(e)
         address = Address.objects.get(id=address_id)
         # print(globals())
-
 
     def delete(self, request, address_id):
         pass
