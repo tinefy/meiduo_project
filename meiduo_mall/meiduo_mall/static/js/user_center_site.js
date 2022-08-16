@@ -15,6 +15,11 @@ let vm = new Vue(
                 tel: '010-67678656',
                 email: 'zhangsan@163.com',
             },
+            form_address_edit: {
+                province_id: '',
+                city_id: '',
+                district_id: '',
+            },
             provinces: [],
             cities: [],
             districts: [],
@@ -57,7 +62,6 @@ let vm = new Vue(
 
                 if (index !== -1) {
                     this.editing_address_flag = true;
-                    // this.clear_form_data();
                     // this.form_address = JSON.parse(JSON.stringify(this.addresses[index]));
                     let t = JSON.parse(JSON.stringify(this.addresses[index]));
                     // t.province_id = this.provinces[0].id;
@@ -82,6 +86,7 @@ let vm = new Vue(
                             t.province_id = address_area.province_id;
                             t.city_id = address_area.city_id;
                             t.district_id = address_area.district_id;
+                            this.clear_form_data();
                             this.form_address = t
                             console.log('1' + this.form_address.city_id);
                         }
@@ -128,7 +133,7 @@ let vm = new Vue(
                 e.preventDefault();
                 this.is_show_editor = false;
             },
-            get_areas: function (area) {
+            get_areas: function (area,set_default=true) {
                 // 注意：axios是异步执行的
                 let url = '';
                 if (area == 'province') {
@@ -146,7 +151,7 @@ let vm = new Vue(
                             if (response.data.code == '0') {
                                 this.provinces = response.data.province_list;
                                 // select下拉框设定默认值
-                                if (!this.editing_address_flag) {
+                                if (set_default) {
                                     this.form_address.province_id = this.provinces[0].id;
                                 }
                             } else {
@@ -156,7 +161,7 @@ let vm = new Vue(
                         } else if (area == 'city') {
                             if (response.data.code == '0') {
                                 this.cities = response.data.sub_data.subs;
-                                if (!this.editing_address_flag) {
+                                if (set_default) {
                                     this.form_address.city_id = this.cities[0].id;
                                 }
                                 console.log(this.form_address.city_id);
@@ -167,7 +172,7 @@ let vm = new Vue(
                         } else if (area == 'district') {
                             if (response.data.code == '0') {
                                 this.districts = response.data.sub_data.subs;
-                                if (!this.editing_address_flag) {
+                                if (set_default) {
                                     this.form_address.district_id = this.districts[0].id;
                                 }
 
@@ -315,9 +320,23 @@ let vm = new Vue(
         },
         watch: {
             'form_address.province_id': function () {
-                this.get_areas('city');
+                if (!this.editing_address_flag) {
+                    this.get_areas('city');
+                } else if (this.editing_address_flag) {
+                    this.form_address_edit.province_id = this.form_address.province_id
+                }
             },
             'form_address.city_id': function () {
+                if (!this.editing_address_flag) {
+                    this.get_areas('district');
+                } else if (this.editing_address_flag) {
+                    this.form_address_edit.city_id = this.form_address.city_id
+                }
+            },
+            'form_address_edit.province_id': function () {
+                this.get_areas('city');
+            },
+            'form_address_edit.city_id': function () {
                 this.get_areas('district');
             },
         },
