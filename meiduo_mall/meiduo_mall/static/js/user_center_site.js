@@ -64,7 +64,7 @@ let vm = new Vue(
                     this.editing_address_flag = true;
                     let t = JSON.parse(JSON.stringify(this.addresses[index]));
                     // 若直接赋值给form_address，因为没有province_id等，
-                    // 会导致即使后续再添加province_id属性，也不会触发Vue Watch中的方法
+                    // 会导致即使后续再添加province_id属性，也不会触发Vue Watch中相应的方法
                     let url = '/address/' + t.id + '/area/';
                     let address_area = {
                         province: t.province,
