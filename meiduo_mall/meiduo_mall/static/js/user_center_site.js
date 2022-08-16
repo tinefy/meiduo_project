@@ -62,16 +62,9 @@ let vm = new Vue(
 
                 if (index !== -1) {
                     this.editing_address_flag = true;
-                    // this.form_address = JSON.parse(JSON.stringify(this.addresses[index]));
                     let t = JSON.parse(JSON.stringify(this.addresses[index]));
-                    // t.province_id = this.provinces[0].id;
-                    // t.city_id = this.cities[0].id;
-                    // t.district_id = this.districts[0].id;
-                    // t.province_id = '';
-                    // t.city_id = '';
-                    // t.district_id = '';
-                    // this.form_address = t;
-                    // console.log(this.form_address);
+                    // 若直接赋值给form_address，因为没有province_id等，
+                    // 会导致即使后续再添加province_id属性，也不会触发Vue Watch中的方法
                     let url = '/address/' + t.id + '/area/';
                     let address_area = {
                         province: t.province,
@@ -87,6 +80,10 @@ let vm = new Vue(
                             t.city_id = address_area.city_id;
                             t.district_id = address_area.district_id;
                             this.clear_form_data();
+                            // clear_form_data不能放在axios前面，
+                            // 否则因为axios异步的原因，会导致clear_form_data时请求一次数据，
+                            // 并将editing_address_flag置为false,
+                            // 下面form_address赋值会再次引发请求数据并设置默认省市区
                             this.form_address = t
                             console.log('1' + this.form_address.city_id);
                         }
