@@ -312,11 +312,10 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
                 'city_id': address.city_id,
                 'district_id': address.district_id,
             }
-            return JsonResponse({'code': RETCODE.OK, 'errmsg': '新增地址成功', 'address_area': address_area})
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '获取省市id成功', 'address_area': address_area})
 
     def post(self, request):
         error_flag, address_data_dict = self.get_and_check_address_data_dict(request)
-        print(address_data_dict)
         if error_flag:
             return
         try:
@@ -336,7 +335,10 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
     def put(self, request, address_id):
         error_flag, address_data_dict = self.get_and_check_address_data_dict(request)
         print(address_data_dict)
-        # address_data_dict.pop('')
+        pop_needless_key=('id', 'province', 'city', 'district')
+        for item in pop_needless_key:
+            address_data_dict.pop(item)
+        print(address_data_dict)
         if error_flag:
             return
         try:
@@ -345,7 +347,8 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
             print(e)
             logger.error(e)
         address = Address.objects.get(id=address_id)
-        # print(globals())
+        address_dict = UserAddressView.address_dict(address)
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': '修改地址成功', 'address': address_dict})
 
     def delete(self, request, address_id):
         pass

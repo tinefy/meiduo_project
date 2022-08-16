@@ -120,9 +120,10 @@ let vm = new Vue(
                     this.clear_form_data();
                     // 清空form数据时，清空了省市区默认数据，会导致引发watch中获取市区数据的方法，
                     // 因为省市数据为空，发送的请求不正确，所以下方重新设置默认数据
-                    this.form_address.province_id = this.provinces[0].id;
-                    this.form_address.city_id = this.cities[0].id;
-                    this.form_address.district_id = this.districts[0].id;
+                    // this.form_address.province_id = this.provinces[0].id;
+                    // this.form_address.city_id = this.cities[0].id;
+                    // this.form_address.district_id = this.districts[0].id;
+                    this.get_areas('province');
                 }
                 this.is_show_editor = true;
             },
@@ -262,7 +263,7 @@ let vm = new Vue(
                             if (response.data.code == '0') {
                                 this.addresses.splice(0, 0, response.data.address);
                                 this.is_show_editor = false;
-                                this.clear_form_data();
+                                // this.clear_form_data();
                             } else if (response.data.code == '4101') {
                                 location.href = '/login/?next=/address/';
                             } else {
@@ -289,7 +290,7 @@ let vm = new Vue(
                         response => {
                             this.addresses[this.editing_address_index] = response.data.address;
                             this.is_show_editor = false;
-                            this.clear_form_data();
+                            // this.clear_form_data();
                         }
                     ).catch(
                         error => {

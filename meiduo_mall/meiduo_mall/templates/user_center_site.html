@@ -151,7 +151,8 @@
           <input v-model="form_address.email" v-on:blur="check_email" type="text" class="email">
           <span v-show="error_tips.error_email" class="email_error">邮箱信息有误</span>
         </div>
-        <input v-on:click="save_address($event)" type="button" name="" value="新 增" class="info_submit">
+        <input v-if="editing_address_index===-1" v-on:click="save_address($event)" type="button" name="" value="新 增" class="info_submit">
+        <input v-else v-on:click="save_address($event)" type="button" name="" value="修 改" class="info_submit">
         <input v-on:click="clear_form_data" type="reset" name="" value="清 空" class="info_submit info_reset">
         <input v-on:click="close_editor" type="reset" name="" value="取 消" class="info_submit info_reset">
       </form>
