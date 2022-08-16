@@ -68,11 +68,11 @@ let vm = new Vue(
                     // t.district_id = '';
                     // this.form_address = t;
                     // console.log(this.form_address);
-                    let url = '/address/' + this.form_address.id + '/area/';
+                    let url = '/address/' + t.id + '/area/';
                     let address_area = {
-                        province: this.form_address.province,
-                        city: this.form_address.city,
-                        district: this.form_address.district,
+                        province: t.province,
+                        city: t.city,
+                        district: t.district,
                     }
                     axios.get(
                         url, {responseType: 'json'}
@@ -170,7 +170,7 @@ let vm = new Vue(
                                 if (!this.editing_address_flag) {
                                     this.form_address.district_id = this.districts[0].id;
                                 }
-                                this.editing_address_flag = false;
+
                             } else {
                                 console.log(response.data);
                                 this.districts = [];
