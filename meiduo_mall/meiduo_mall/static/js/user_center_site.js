@@ -133,7 +133,7 @@ let vm = new Vue(
                 e.preventDefault();
                 this.is_show_editor = false;
             },
-            get_areas: function (area,set_default=true) {
+            get_areas: function (area, set_default = true) {
                 // 注意：axios是异步执行的
                 let url = '';
                 if (area == 'province') {
@@ -323,21 +323,17 @@ let vm = new Vue(
                 if (!this.editing_address_flag) {
                     this.get_areas('city');
                 } else if (this.editing_address_flag) {
-                    this.form_address_edit.province_id = this.form_address.province_id
+                    this.get_areas('city', false);
+                    this.editing_address_flag = false;
                 }
             },
             'form_address.city_id': function () {
                 if (!this.editing_address_flag) {
                     this.get_areas('district');
                 } else if (this.editing_address_flag) {
-                    this.form_address_edit.city_id = this.form_address.city_id
+                    this.get_areas('district', false);
+                    this.editing_address_flag = false;
                 }
-            },
-            'form_address_edit.province_id': function () {
-                this.get_areas('city');
-            },
-            'form_address_edit.city_id': function () {
-                this.get_areas('district');
             },
         },
         mounted: function () {
