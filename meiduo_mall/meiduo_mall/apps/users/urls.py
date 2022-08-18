@@ -23,4 +23,6 @@ urlpatterns = [
             name='address_delete'),
     re_path(r'^address/(?P<address_id>\d+)/set/default/$', views.UserAddressSetDefaultView.as_view(),
             name='address_set_default'),
+    re_path(r'^address/(?P<address_id>\d+)/set/title/$', views.UserAddressSetTitleView.as_view(),
+            name='address_set_default'),
 ]

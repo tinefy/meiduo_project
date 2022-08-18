@@ -373,3 +373,25 @@ class UserAddressSetDefaultView(LoginRequiredJSONMixin, View):
             print(e)
             return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '设置默认地址失败'})
         return JsonResponse({'code': RETCODE.OK, 'errmsg': '设置默认地址成功'})
+
+
+class UserAddressSetTitleView(LoginRequiredJSONMixin, View):
+    def put(self, request, address_id):
+        new_title_data_dict = json.loads(request.body.decode())
+        new_title = new_title_data_dict['title']
+        if new_title:
+            try:
+                # address = Address.objects.get(id=address_id)
+                # request.user.default_address = address
+                # request.user.save()
+                Address.objects.filter(id=address_id).update(title=new_title)
+            except Exception as e:
+                logger.error(e)
+                print(e)
+                return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '设置地址标题失败'})
+            else:
+                title_dict = {'title': Address.objects.get(id=address_id).title}
+                return JsonResponse({'code': RETCODE.OK, 'errmsg': '设置地址标题成功', 'title': title_dict})
+        else:
+            title_dict = {'title': Address.objects.get(id=address_id).title}
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '新标题为空，保持原地址标题', 'title': title_dict})

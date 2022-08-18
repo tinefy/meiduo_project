@@ -35,10 +35,9 @@ let vm = new Vue(
             set_default_area_flag: true,
 
             addresses: JSON.parse(JSON.stringify(addresses)),
-            // addresses: [{"title":"ABC",},],
             default_address_id: default_address_id == 'None' ? null : default_address_id,
 
-            edit_title_index: null,
+            edit_title_index: -1,
             new_title: '',
         },
         methods: {
@@ -308,13 +307,40 @@ let vm = new Vue(
                     )
                 }
             },
+            title_editor:function (index){
+                this.new_title=this.addresses[index].title;
+                this.edit_title_index=index;
+            },
             save_title: function (index) {
                 // e.preventDefault();
-                this.edit_title_index;
+                let url = '/address/' + this.addresses[index].id + '/set/title/';
+                axios.put(
+                    url, {
+                        title: this.new_title,
+                    }, {
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        responseType: 'json',
+                    }
+                ).then(response => {
+                        if (response.data.code == '0') {
+                            this.addresses[index].title = response.data.title.title;
+                            this.edit_title_index = -1;
+                        } else if (response.data.code == '4101') {
+                            location.href = '/login/?next=/address/';
+                        } else {
+                            alert(response.data.errmsg);
+                        }
+                    }
+                ).catch(error => {
+                        console.log(error.response);
+                    }
+                )
             },
             cancel_title: function (index) {
                 // e.preventDefault();
-                this.new_title;
+                this.edit_title_index = -1;
             },
             delete_address: function (index) {
                 // e.preventDefault();

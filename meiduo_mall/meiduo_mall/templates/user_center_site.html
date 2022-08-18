@@ -71,11 +71,11 @@
         <div class="site_title">
           <div v-if="edit_title_index===index">
             <input v-model="new_title" type="text" name="">
-            <input @click="save_title(index)" type="button" name="" value="保 存">
-            <input @click="cancel_title(index)" type="reset" name="" value="取 消">
+            <input v-on:click="save_title(index)" type="button" name="" value="保 存">
+            <input v-on:click="cancel_title(index)" type="reset" name="" value="取 消">
           </div>
           <h3>[[ address.title ]]</h3>
-          <a v-on:click="edit_title_index=index" href="javascript:;"></a>
+          <a v-on:click="title_editor(index)" href="javascript:;"></a>
           <em v-if="address.id===default_address_id">默认地址</em>
           <span v-on:click="delete_address(index)" class="del_site">×</span>
         </div>
