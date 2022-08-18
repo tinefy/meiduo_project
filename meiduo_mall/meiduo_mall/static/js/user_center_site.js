@@ -90,15 +90,18 @@ let vm = new Vue(
                             // 否则因为axios异步的原因，会导致clear_form_data时请求一次数据，
                             // 并将editing_address_flag置为false,
                             // 下面form_address赋值会再次引发请求数据并设置默认省市区
-                            this.form_address = t
-                            console.log('1' + this.form_address.city_id);
+                            if (t.province_id===this.form_address.province_id && t.city_id===this.form_address.city_id)
+                                // 如果用户点击“编辑”并且没有变动省市区，再次点击“编辑”需要判断是否与上次相同，
+                                // 相同则不会触发watch中相应的方法，导致若此时变动省市区，不能设置默认省市区，
+                                // 所以需要将editing_address_flag置为false，触发设置默认省市区。
+                                this.editing_address_flag = false;
+                            this.form_address = t;
                         }
                     ).catch(
                         error => {
                             console.log(error.response);
                         }
                     )
-                    console.log(this.form_address.city_id);
                     // for (let province of this.provinces) {
                     //     // console.log(province);
                     //     if (province.name === this.form_address.province) {
