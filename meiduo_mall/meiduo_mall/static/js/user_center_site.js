@@ -123,7 +123,7 @@ let vm = new Vue(
                     // this.get_areas('province');
                 } else {
                     this.editing_address_flag = false;
-                    this.clear_form_data();
+                    this.clear_form_data(true);
                 }
                 this.is_show_editor = true;
             },
