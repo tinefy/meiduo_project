@@ -11,9 +11,23 @@ let vm = new Vue(
             error_password: false,
             error_new_password: false,
             error_new_password2: false,
-            error_tip: '',
+            tip: '',
         },
         methods: {
+            clear_error: function () {
+                this.error_password = false;
+                this.error_new_password = false;
+                this.error_new_password2 = false;
+            },
+            clear_form: function (tip=true) {
+                this.password = '';
+                this.new_password = '';
+                this.new_password2 = '';
+                this.clear_error();
+                if (tip) {
+                    this.tip = '';
+                }
+            },
             check_password: function (password = 'old') {
                 let re = /^[\w\d]{8,20}$/;
                 if (password === 'old') {
@@ -56,7 +70,8 @@ let vm = new Vue(
                         }
                     ).then(
                         response => {
-                            response.data;
+                            this.tip = response.data.errmsg;
+                            this.clear_form(false);
                         }
                     ).catch(
                         error => {
@@ -66,7 +81,7 @@ let vm = new Vue(
                 }
             },
             cancel_new_password: function () {
-
+                this.clear_form();
             },
 
         },

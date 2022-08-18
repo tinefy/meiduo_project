@@ -188,7 +188,7 @@ class UserInfoPasswordView(LoginRequiredJSONMixin, View):
 
         user = request.user
         logout(request)
-        response = JsonResponse({'code': RETCODE.DBERR, 'errmsg': '成功修改密码！'})
+        response = JsonResponse({'code': RETCODE.OK, 'errmsg': '成功修改密码！'})
         login(request, user=user)
 
         # if remembered != 'on':
@@ -198,6 +198,11 @@ class UserInfoPasswordView(LoginRequiredJSONMixin, View):
         # else:
         #     response = redirect(reverse('contents:index'))
         # response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
+
+        # 清理状态保持信息
+        # logout(request)
+        # response = redirect(reverse('users:login'))
+        # response.delete_cookie('username')
 
         return response
 
