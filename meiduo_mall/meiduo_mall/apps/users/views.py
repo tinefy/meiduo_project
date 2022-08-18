@@ -335,7 +335,7 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
     def put(self, request, address_id):
         error_flag, address_data_dict = self.get_and_check_address_data_dict(request)
         print(address_data_dict)
-        pop_needless_key=('id', 'province', 'city', 'district')
+        pop_needless_key = ('id', 'province', 'city', 'district')
         for item in pop_needless_key:
             address_data_dict.pop(item)
         print(address_data_dict)
@@ -344,11 +344,18 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
         try:
             Address.objects.filter(id=address_id).update(user=request.user, **address_data_dict)
         except Exception as e:
-            print(e)
             logger.error(e)
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '修改地址失败'})
         address = Address.objects.get(id=address_id)
         address_dict = UserAddressView.address_dict(address)
         return JsonResponse({'code': RETCODE.OK, 'errmsg': '修改地址成功', 'address': address_dict})
 
     def delete(self, request, address_id):
-        pass
+        try:
+            Address.objects.filter(id=address_id).update(is_deleted=True)
+            # Address.objects.filter(id=address_id).delete()
+        except Exception as e:
+            logger.error(e)
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '删除地址失败'})
+
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': '删除地址成功'})

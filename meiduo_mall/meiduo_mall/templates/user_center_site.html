@@ -153,7 +153,7 @@
         </div>
         <input v-if="editing_address_index===-1" v-on:click="save_address($event)" type="button" name="" value="新 增" class="info_submit">
         <input v-else v-on:click="save_address($event)" type="button" name="" value="修 改" class="info_submit">
-        <input v-on:click="clear_form_data" type="reset" name="" value="清 空" class="info_submit info_reset">
+        <input v-on:click="clear_form_data(true)" type="reset" name="" value="清 空" class="info_submit info_reset">
         <input v-on:click="close_editor" type="reset" name="" value="取 消" class="info_submit info_reset">
       </form>
     </div>

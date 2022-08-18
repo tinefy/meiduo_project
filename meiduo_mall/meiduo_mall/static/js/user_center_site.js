@@ -42,13 +42,19 @@ let vm = new Vue(
             new_title: '',
         },
         methods: {
-            clear_form_data: function () {
+            clear_form_data: function (get_areas_ = false) {
                 let keys = Object.keys(this.form_address);
+                let exclude = [this.form_address.province_id, this.form_address.city_id, this.form_address.district_id]
+                // 清空form数据时，不清空省市区数据，否则会导致引发watch中获取市区数据的方法，如果省市数据为空，发送的请求不正确
                 for (let i = 0; i < keys.length; i++) {
-                    this.form_address[keys[i]] = '';
+                    if (exclude.indexOf(this.form_address[keys[i]]) === -1) {
+                        this.form_address[keys[i]] = '';
+                    }
                 }
                 this.clear_errors();
-                // this.get_areas('province');
+                if (get_areas_) {
+                    this.get_areas('province');
+                }
             },
             clear_errors: function () {
                 let keys = Object.keys(this.error_tips);
@@ -118,12 +124,6 @@ let vm = new Vue(
                 } else {
                     this.editing_address_flag = false;
                     this.clear_form_data();
-                    // 清空form数据时，清空了省市区默认数据，会导致引发watch中获取市区数据的方法，
-                    // 因为省市数据为空，发送的请求不正确，所以下方重新设置默认数据
-                    // this.form_address.province_id = this.provinces[0].id;
-                    // this.form_address.city_id = this.cities[0].id;
-                    // this.form_address.district_id = this.districts[0].id;
-                    this.get_areas('province');
                 }
                 this.is_show_editor = true;
             },
@@ -288,9 +288,15 @@ let vm = new Vue(
                         }
                     ).then(
                         response => {
-                            this.addresses[this.editing_address_index] = response.data.address;
-                            this.is_show_editor = false;
-                            // this.clear_form_data();
+                            if (response.data.code == '0') {
+                                this.addresses[this.editing_address_index] = response.data.address;
+                                this.is_show_editor = false;
+                                // this.clear_form_data();
+                            } else if (response.data.code == '4101') {
+                                location.href = '/login/?next=/address/';
+                            } else {
+                                alert(response.data.errmsg);
+                            }
                         }
                     ).catch(
                         error => {
@@ -309,7 +315,29 @@ let vm = new Vue(
             },
             delete_address: function (index) {
                 // e.preventDefault();
-                this.new_title;
+                let url = '/address/' + this.addresses[index].id + '/delete/';
+                axios.delete(
+                    url, {
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        responseType: 'json',
+                    }
+                ).then(
+                    response => {
+                        if (response.data.code == '0') {
+                            this.addresses.splice(index, 1);
+                        } else if (response.data.code == '4101') {
+                            location.href = '/login/?next=/address/';
+                        } else {
+                            alert(response.data.errmsg);
+                        }
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response);
+                    }
+                )
             },
             set_default: function (index) {
                 // e.preventDefault();
