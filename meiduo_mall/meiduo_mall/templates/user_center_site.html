@@ -58,8 +58,8 @@
       <ul>
         <li><a href="{{ url('users:info') }}">· 个人信息</a></li>
         <li><a href="{{ url('users:address') }}" class="active">· 收货地址</a></li>
-        <li><a href=" user_center_order.html">· 全部订单</a></li>
-        <li><a href="user_center_pass.html">· 修改密码</a></li>
+        <li><a href="user_center_order.html">· 全部订单</a></li>
+        <li><a href="{{ url('users:password') }}">· 修改密码</a></li>
       </ul>
     </div>
     <div class="right_content clearfix">
@@ -151,7 +151,8 @@
           <input v-model="form_address.email" v-on:blur="check_email" type="text" class="email">
           <span v-show="error_tips.error_email" class="email_error">邮箱信息有误</span>
         </div>
-        <input v-if="editing_address_index===-1" v-on:click="save_address($event)" type="button" name="" value="新 增" class="info_submit">
+        <input v-if="editing_address_index===-1" v-on:click="save_address($event)" type="button" name="" value="新 增"
+               class="info_submit">
         <input v-else v-on:click="save_address($event)" type="button" name="" value="修 改" class="info_submit">
         <input v-on:click="clear_form_data(true)" type="reset" name="" value="清 空" class="info_submit info_reset">
         <input v-on:click="close_editor" type="reset" name="" value="取 消" class="info_submit info_reset">

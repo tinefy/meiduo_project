@@ -5,64 +5,70 @@ let vm = new Vue(
         data: {
             // username: getCookie('username'),
             username: username,
-            mobile: mobile,
-            email: email,
-            email_active: email_active,
-
-            error_email: false,
-            set_email: false,
-            send_email_btn_disabled: false,
-            send_email_tip: '重新发送验证邮件',
-        },
-        mounted: function () {
-            this.email_active = (this.email_active == 'True') ? true : false;
-            this.set_email = (this.email == '') ? true : false;
+            password: '',
+            new_password: '',
+            new_password2: '',
+            error_password: false,
+            error_new_password: false,
+            error_new_password2: false,
+            error_tip: '',
         },
         methods: {
-            check_email: function () {
-                let re = /^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$/;
-                if (re.test(this.email)) {
-                    this.error_email = false;
-                } else {
-                    this.error_email = true;
+            check_password: function (password = 'old') {
+                let re = /^[\w\d]{8,20}$/;
+                if (password === 'old') {
+                    if (re.test(this.password)) {
+                        this.error_password = false;
+                    } else {
+                        this.error_password = true;
+                    }
+                } else if (password === 'new') {
+                    if (re.test(this.new_password)) {
+                        this.error_new_password = false;
+                    } else {
+                        this.error_new_password = true;
+                    }
+                } else if (password === 'new2') {
+                    if (this.new_password2 === this.new_password) {
+                        this.error_new_password2 = false;
+                    } else {
+                        this.error_new_password2 = true;
+                    }
                 }
             },
-            save_email: function () {
-                this.check_email();
-                if (!this.error_email) {
-                    let url = '/emails/';
+            save_new_password: function () {
+                this.check_password()
+                this.check_password('new')
+                this.check_password('new2')
+                if (this.error_password === false && this.error_new_password === false && this.error_new_password2 === false) {
+                    let url = '/info/password/';
+                    let data_ = {
+                        old_password: this.password,
+                        new_password: this.new_password,
+                        new_password2: this.new_password2,
+                    };
                     axios.put(
-                        url, {
-                            email: this.email
-                        }, {
+                        url, data_, {
                             headers: {
                                 'X-CSRFToken': getCookie('csrftoken')
                             },
-                            responseType: 'json'
+                            responseType: 'json',
                         }
                     ).then(
                         response => {
-                            if (response.data.code == '0') {
-                                this.set_email = false;
-                                this.send_email_tip = '已发送验证邮件';
-                                this.send_email_btn_disabled = true;
-                            } else if (response.data.code == '4101') {
-                                location.href = '/login/?next=/info/';
-                            } else {
-                                alert(response.data.errmsg);
-                            }
+                            response.data;
                         }
                     ).catch(
                         error => {
-                            alert(error.response);
+                            console.log(error.response);
                         }
                     )
                 }
             },
-            cancel_email: function () {
-                this.email='';
-                this.error_email=false;
+            cancel_new_password: function () {
+
             },
+
         },
     }
 )

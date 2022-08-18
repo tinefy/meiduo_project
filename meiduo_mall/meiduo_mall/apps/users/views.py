@@ -151,6 +151,57 @@ class UserInfoView(LoginRequiredMixin, View):
         return render(request, 'user_center_info.html', context=context)
 
 
+class UserInfoPasswordView(LoginRequiredJSONMixin, View):
+    def get(self, request):
+        context = {
+            'username': request.user.username,
+        }
+        return render(request, 'user_center_password.html', context=context)
+
+    def put(self, request):
+        password_data_dict = json.loads(request.body.decode())
+        print(password_data_dict)
+
+        for key, value in password_data_dict.items():
+            # 将key转为变量名并让key=value
+            globals()[key] = value
+
+        necessary = [old_password, new_password, new_password2]
+        if not all(necessary):
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '缺少必填信息'})
+        try:
+            request.user.check_password(old_password)
+        except Exception as e:
+            logger.error(e)
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '原密码错误'})
+        if not re.match(r'^[0-9A-Za-z]{8,20}$', new_password):
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '密码最少8位，最长20位'})
+        if new_password != new_password2:
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '两次输入的密码不一致'})
+
+        try:
+            request.user.set_password(new_password)
+            request.user.save()
+        except Exception as e:
+            logger.error(e)
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '修改密码失败'})
+
+        user = request.user
+        logout(request)
+        response = JsonResponse({'code': RETCODE.DBERR, 'errmsg': '成功修改密码！'})
+        login(request, user=user)
+
+        # if remembered != 'on':
+        #     request.session.set_expiry(0)
+        # else:
+        #     request.session.set_expiry(None)
+        # else:
+        #     response = redirect(reverse('contents:index'))
+        # response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
+
+        return response
+
+
 class UserEmailsView(LoginRequiredJSONMixin, View):
     def put(self, request):
         data = json.loads(request.body.decode())
