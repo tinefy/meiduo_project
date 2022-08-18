@@ -32,7 +32,7 @@ let vm = new Vue(
                 error_email: false,
             },
             editing_address_index: -1,
-            editing_address_flag: false,
+            set_default_area_flag: true,
 
             addresses: JSON.parse(JSON.stringify(addresses)),
             // addresses: [{"title":"ABC",},],
@@ -67,7 +67,7 @@ let vm = new Vue(
                 this.editing_address_index = index;
 
                 if (index !== -1) {
-                    this.editing_address_flag = true;
+                    this.set_default_area_flag = false;
                     let t = JSON.parse(JSON.stringify(this.addresses[index]));
                     // 若直接赋值给form_address，因为没有province_id等，
                     // 会导致即使后续再添加province_id属性，也不会触发Vue Watch中相应的方法
@@ -88,13 +88,13 @@ let vm = new Vue(
                             this.clear_form_data();
                             // clear_form_data不能放在axios前面，
                             // 否则因为axios异步的原因，会导致clear_form_data时请求一次数据，
-                            // 并将editing_address_flag置为false,
+                            // 并将set_default_area_flag置为true,
                             // 下面form_address赋值会再次引发请求数据并设置默认省市区
                             if (t.province_id===this.form_address.province_id && t.city_id===this.form_address.city_id)
                                 // 如果用户点击“编辑”并且没有变动省市区，再次点击“编辑”需要判断是否与上次相同，
                                 // 相同则不会触发watch中相应的方法，导致若此时变动省市区，不能设置默认省市区，
-                                // 所以需要将editing_address_flag置为false，触发设置默认省市区。
-                                this.editing_address_flag = false;
+                                // 所以需要将set_default_area_flag置为true，触发设置默认省市区。
+                                this.set_default_area_flag = true;
                             this.form_address = t;
                         }
                     ).catch(
@@ -125,7 +125,7 @@ let vm = new Vue(
                     // }
                     // this.get_areas('province');
                 } else {
-                    this.editing_address_flag = false;
+                    this.set_default_area_flag = true;
                     this.clear_form_data(true);
                 }
                 this.is_show_editor = true;
@@ -349,19 +349,19 @@ let vm = new Vue(
         },
         watch: {
             'form_address.province_id': function () {
-                if (!this.editing_address_flag) {
+                if (this.set_default_area_flag) {
                     this.get_areas('city');
-                } else if (this.editing_address_flag) {
+                } else if (!this.set_default_area_flag) {
                     this.get_areas('city', false);
-                    this.editing_address_flag = false;
+                    this.set_default_area_flag = true;
                 }
             },
             'form_address.city_id': function () {
-                if (!this.editing_address_flag) {
+                if (this.set_default_area_flag) {
                     this.get_areas('district');
-                } else if (this.editing_address_flag) {
+                } else if (!this.set_default_area_flag) {
                     this.get_areas('district', false);
-                    this.editing_address_flag = false;
+                    this.set_default_area_flag = true;
                 }
             },
         },
