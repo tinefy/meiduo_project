@@ -359,3 +359,17 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
             return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '删除地址失败'})
 
         return JsonResponse({'code': RETCODE.OK, 'errmsg': '删除地址成功'})
+
+
+class UserAddressSetDefaultView(LoginRequiredJSONMixin, View):
+    def put(self, request, address_id):
+        try:
+            # address = Address.objects.get(id=address_id)
+            # request.user.default_address = address
+            # request.user.save()
+            User.objects.filter(id=request.user.id).update(default_address=address_id)
+        except Exception as e:
+            logger.error(e)
+            print(e)
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '设置默认地址失败'})
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': '设置默认地址成功'})

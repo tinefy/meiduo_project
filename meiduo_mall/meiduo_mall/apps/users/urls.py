@@ -21,4 +21,6 @@ urlpatterns = [
             name='address_modify'),
     re_path(r'^address/(?P<address_id>\d+)/delete/$', views.UserAddressCreateModifyView.as_view(),
             name='address_delete'),
+    re_path(r'^address/(?P<address_id>\d+)/set/default/$', views.UserAddressSetDefaultView.as_view(),
+            name='address_set_default'),
 ]
