@@ -27,6 +27,8 @@ from .models import Address
 
 
 User = get_user_model()
+# 用户名：mduser
+# 密码: eSJUgKnDne
 
 logger = logging.Logger('django')
 
