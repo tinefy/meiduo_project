@@ -188,13 +188,13 @@ LOGGING = {
     },
     'handlers': {  # 日志处理方法
         'console': {  # 向终端中输出日志
-            'level': 'INFO',
+            'level': 'DEBUG',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
         'file': {  # 向文件中输出日志
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/meiduo.log'),  # 日志文件的位置
             'maxBytes': 300 * 1024 * 1024,
@@ -207,6 +207,11 @@ LOGGING = {
             'handlers': ['console', 'file'],  # 可以同时向终端与文件中输出日志
             'propagate': True,  # 是否继续传递日志信息
             'level': 'INFO',  # 日志器接收的最低日志级别
+        },
+        'django.db.backends': { # Django查看原生SQL语句logging配置
+            'handlers': ['console', 'file'],
+            'propagate': True,
+            'level': 'DEBUG',
         },
     }
 }
