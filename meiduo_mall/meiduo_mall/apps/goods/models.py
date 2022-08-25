@@ -5,40 +5,15 @@ from meiduo_mall.utils.models import BaseModel
 
 # Create your models here.
 class GoodsCategory(BaseModel):
-    pass
+    name = models.CharField(max_length=10, verbose_name='名称')
+    parent = models.ForeignKey('self', related_name='subs', null=True, blank=True, on_delete=models.CASCADE,
+                               verbose_name='父类别')
 
+    class Meta(object):
+        db_table = 'tb_goods_category'
+        verbose_name = '商品类别'
+        verbose_name_plural = verbose_name
 
-class GoodsChannelGroup(BaseModel):
-    pass
+    def __str__(self):
+        return self.name
 
-
-class GoodsChannel(BaseModel):
-    pass
-
-
-class Brand(BaseModel):
-    pass
-
-
-class SPU(BaseModel):
-    pass
-
-
-class SKU(BaseModel):
-    pass
-
-
-class SKUImage(BaseModel):
-    pass
-
-
-class SPUSpecification(BaseModel):
-    pass
-
-
-class SpecificationOption(BaseModel):
-    pass
-
-
-class SKUSpecification(BaseModel):
-    pass
