@@ -208,11 +208,11 @@ LOGGING = {
             'propagate': True,  # 是否继续传递日志信息
             'level': 'INFO',  # 日志器接收的最低日志级别
         },
-        'django.db.backends': { # Django查看原生SQL语句logging配置
-            'handlers': ['console', 'file'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
+        # 'django.db.backends': { # Django查看原生SQL语句logging配置
+        #     'handlers': ['console', 'file'],
+        #     'propagate': True,
+        #     'level': 'DEBUG',
+        # },
     }
 }
 
