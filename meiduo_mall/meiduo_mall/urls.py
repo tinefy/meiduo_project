@@ -14,8 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, re_path, include
 from django.views.generic import RedirectView
+
+from meiduo_mall.utils import views as contents_views
 
 urlpatterns = [
     path('favicon.ico', RedirectView.as_view(url='static/favicon.ico')),
@@ -25,5 +27,5 @@ urlpatterns = [
     path('', include('verifications.urls', namespace='verifications')),
     path('', include('oauth.urls', namespace='oauth')),
     path('', include('areas.urls', namespace='areas')),
+    re_path(r'(?P<fastdfs>^group\d+?/.*?$)', contents_views.FastDFSView.as_view()),
 ]
-
