@@ -9,7 +9,9 @@ from .utils import get_categories
 class IndexView(View):
 
     def get(self, request):
+        # 查询商品频道和分类
         categories = get_categories()
+        # 广告数据
         contents = {}
         content_categories = ContentCategory.objects.all()
         for category in content_categories:
