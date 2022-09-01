@@ -104,6 +104,7 @@
     </div>
   </div>
   <div class="pos_center_con clearfix">
+    <!--轮播图广告-->
     <ul class="slide">
       {% for content in contents['index_lbt'] %}
       <li><a href="{{ content.url }}"><img src="{{ content.image }}" alt="{{ content.title }}"></a></li>
@@ -118,15 +119,13 @@
         <a href="#">更多 &gt;</a>
       </div>
       <ul class="news_list">
-        <li><a href="#">i7顽石低至4199元</a></li>
-        <li><a href="#">奥克斯专场 正1匹空调1313元抢</a></li>
-        <li><a href="#">荣耀9青春版 高配 领券立减220元</a></li>
-        <li><a href="#">美多探索公益新模式</a></li>
-        <li><a href="#">i7顽石低至4199元</a></li>
-        <li><a href="#">正1匹空调1313元抢</a></li>
-        <li><a href="#">奥克斯专场 正1匹空调1313元抢</a></li>
+        {% for content in contents['index_kx'] %}
+        <li><a href="{{ content.url }}">{{ content.title }}</a></li>
+        {% endfor %}
       </ul>
-      <a href="#" class="advs"><img src="../static/images/adv01.jpg"></a>
+      {% for content in contents['index_ytgg'] %}
+      <a href="{{ content.url }}" class="advs"><img src="{{ content.image }}"></a>
+      {% endfor %}
     </div>
   </div>
   <div class="floor_adv">
