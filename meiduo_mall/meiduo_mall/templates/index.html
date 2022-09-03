@@ -135,13 +135,8 @@
         <!--一楼-->
         <h3 class="fl" id="model01">1F 手机通讯</h3>
         <div class="subtitle fr">
-          <a v-for="(item, index) in f1_tabs" v-bind:class="f1_tab===index?'active':''"
-             v-on:mouseenter="floor_tab(f1_tab,index)">[[ item ]]</a>
-
-
-          <!--          <a v-bind:class="f1_tab===1?'active':''" v-on:mouseenter="f1_tab=1">时尚新品</a>-->
-          <!--          <a v-bind:class="f1_tab===2?'active':''" v-on:mouseenter="f1_tab=2">畅想低价</a>-->
-          <!--          <a v-bind:class="f1_tab===3?'active':''" v-on:mouseenter="f1_tab=3">手机配件</a>-->
+          <a v-for="(item, index) in floors.f1_tabs" v-bind:class="floors.f1_tab===index+1?'active':''"
+             v-on:mouseenter="floor_tab('1',index)">[[ item ]]</a>
         </div>
       </div>
       <div class="goods_con clearfix">
@@ -159,7 +154,7 @@
           </div>
         </div>
         <div class="goods_list_con">
-          <ul v-show="f1_tab===1" class="goods_list fl">
+          <ul v-show="floors.f1_tab===1" class="goods_list fl">
             {% for content in contents['index_1f_ssxp'] %}
             <li>
               <a href="{{ content.url }}" class="goods_pic"><img src="{{ content.image }}"></a>
@@ -169,7 +164,7 @@
             </li>
             {% endfor %}
           </ul>
-          <ul v-show="f1_tab===2" class="goods_list fl">
+          <ul v-show="floors.f1_tab===2" class="goods_list fl">
             {% for content in contents['index_1f_cxdj'] %}
             <li>
               <a href="{{ content.url }}" class="goods_pic"><img src="{{ content.image }}"></a>
@@ -179,7 +174,7 @@
             </li>
             {% endfor %}
           </ul>
-          <ul v-show="f1_tab===3" class="goods_list fl">
+          <ul v-show="floors.f1_tab===3" class="goods_list fl">
             {% for content in contents['index_1f_sjpj'] %}
             <li>
               <a href="{{ content.url }}" class="goods_pic"><img src="{{ content.image }}"></a>
@@ -196,8 +191,8 @@
       <div class="list_title clearfix">
         <h3 class="fl" id="model01">2F 电脑数码</h3>
         <div class="subtitle fr">
-          <a>加价换购</a>
-          <a>畅享低价</a>
+          <a v-for="(item, index) in floors.f2_tabs" v-bind:class="floors.f2_tab===index+1?'active':''"
+             v-on:mouseenter="floor_tab('2',index)">[[ item ]]</a>
         </div>
       </div>
       <div class="goods_con clearfix">
@@ -215,7 +210,7 @@
           </div>
         </div>
         <div class="goods_list_con">
-          <ul v-show="f2_tab===1" class="goods_list fl">
+          <ul v-show="floors.f2_tab===1" class="goods_list fl">
             {% for content in contents.index_2f_cxdj %}
             <li>
               <a href="{{ content.url }}" class="goods_pic"><img src="{{ content.image }}"></a>
@@ -224,7 +219,7 @@
             </li>
             {% endfor %}
           </ul>
-          <ul v-show="f2_tab===2" class="goods_list fl">
+          <ul v-show="floors.f2_tab===2" class="goods_list fl">
             {% for content in contents.index_2f_jjhg %}
             <li>
               <a href="{{ content.url }}" class="goods_pic"><img src="{{ content.image }}"></a>
@@ -240,8 +235,8 @@
       <div class="list_title clearfix">
         <h3 class="fl" id="model01">3F 家居家装</h3>
         <div class="subtitle fr">
-          <a>生活用品</a>
-          <a>厨房用品</a>
+          <a v-for="(item, index) in floors.f3_tabs" v-bind:class="floors.f3_tab===index+1?'active':''"
+             v-on:mouseenter="floor_tab('3',index)">[[ item ]]</a>
         </div>
       </div>
       <div class="goods_con clearfix">
@@ -259,7 +254,7 @@
           </div>
         </div>
         <div class="goods_list_con">
-          <ul v-show="f3_tab===1" class="goods_list fl">
+          <ul v-show="floors.f3_tab===1" class="goods_list fl">
             {% for content in contents.index_3f_shyp %}
             <li>
               <a href="{{ content.url }}" class="goods_pic"><img src="{{ content.image }}"></a>
@@ -268,7 +263,7 @@
             </li>
             {% endfor %}
           </ul>
-          <ul v-show="f3_tab===2" class="goods_list fl">
+          <ul v-show="floors.f3_tab===2" class="goods_list fl">
             {% for content in contents.index_3f_cfyp %}
             <li>
               <a href="{{ content.url }}" class="goods_pic"><img src="{{ content.image }}"></a>
