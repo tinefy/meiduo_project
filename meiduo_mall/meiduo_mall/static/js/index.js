@@ -5,16 +5,6 @@ let vm = new Vue(
         data: {
             username: getCookie('username'),
 
-            // f1_tabs: [
-            //     '时尚新品',
-            //     '畅想低价',
-            //     '手机配件',
-            // ],
-            //
-            // f1_tab: 1,
-            // f2_tab: 1,
-            // f3_tab: 1,
-
             floors: {
                 f1_tabs: [
                     '时尚新品',
@@ -34,10 +24,5 @@ let vm = new Vue(
                 f3_tab: 1,
             },
         },
-        methods: {
-            floor_tab: function (floor, index) {
-                this.floors['f' + floor + '_tab'] = index + 1;
-            },
-        }
     }
 )

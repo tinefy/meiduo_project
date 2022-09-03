@@ -136,7 +136,7 @@
         <h3 class="fl" id="model01">1F 手机通讯</h3>
         <div class="subtitle fr">
           <a v-for="(item, index) in floors.f1_tabs" v-bind:class="floors.f1_tab===index+1?'active':''"
-             v-on:mouseenter="floor_tab('1',index)">[[ item ]]</a>
+             v-on:mouseenter="floors.f1_tab=index+1">[[ item ]]</a>
         </div>
       </div>
       <div class="goods_con clearfix">
@@ -192,7 +192,7 @@
         <h3 class="fl" id="model01">2F 电脑数码</h3>
         <div class="subtitle fr">
           <a v-for="(item, index) in floors.f2_tabs" v-bind:class="floors.f2_tab===index+1?'active':''"
-             v-on:mouseenter="floor_tab('2',index)">[[ item ]]</a>
+             v-on:mouseenter="floors.f2_tab=index+1">[[ item ]]</a>
         </div>
       </div>
       <div class="goods_con clearfix">
@@ -236,7 +236,7 @@
         <h3 class="fl" id="model01">3F 家居家装</h3>
         <div class="subtitle fr">
           <a v-for="(item, index) in floors.f3_tabs" v-bind:class="floors.f3_tab===index+1?'active':''"
-             v-on:mouseenter="floor_tab('3',index)">[[ item ]]</a>
+             v-on:mouseenter="floors.f3_tab=index+1">[[ item ]]</a>
         </div>
       </div>
       <div class="goods_con clearfix">
