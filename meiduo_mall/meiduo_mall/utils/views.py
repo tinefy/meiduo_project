@@ -25,10 +25,11 @@ class LoginRequiredJSONMixin(LoginRequiredMixin):
 
 class FastDFSView(View):
     def get(self, request, fastdfs):
+        fastdfs_b = fastdfs.encode()
         config_ = get_tracker_conf(
             r'/home/vubuntu/PycharmProjects/meiduo_project/meiduo_mall/meiduo_mall/utils/fastdfs/client.conf')
         client = Fdfs_client(config_)
-        ret = client.download_to_buffer(fastdfs.encode())
+        ret = client.download_to_buffer(fastdfs_b)
         content_type = ''
         if fastdfs.endswith('.jpg') or fastdfs.endswith('.jpeg'):
             content_type = 'image/jpeg'
