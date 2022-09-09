@@ -44,10 +44,10 @@ class FileView(View):
         file_name = url.split('/')[-1]
         file = file_path + file_name
 
-        def file_iter(file, chunk_size):
-            with open(file, 'rb') as fd:
+        def file_iter(file_, chunk_size_):
+            with open(file_, 'rb') as fd:
                 while True:
-                    c = fd.read(chunk_size)
+                    c = fd.read(chunk_size_)
                     if c:
                         yield c
                     else:
