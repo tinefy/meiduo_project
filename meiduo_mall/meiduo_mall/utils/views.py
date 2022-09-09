@@ -1,6 +1,6 @@
 # LoginRequiredJSONMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
+from django.http import JsonResponse, StreamingHttpResponse
 
 from meiduo_mall.utils.response_code import RETCODE
 
@@ -8,6 +8,9 @@ from meiduo_mall.utils.response_code import RETCODE
 from django.views import View
 from django.http import HttpResponse
 from fdfs_client.client import Fdfs_client, get_tracker_conf
+
+# FileView
+from django.http import StreamingHttpResponse
 
 
 class LoginRequiredJSONMixin(LoginRequiredMixin):
@@ -32,3 +35,25 @@ class FastDFSView(View):
         elif fastdfs.endswith('.png'):
             content_type = 'image/png'
         return HttpResponse(ret['Content'], content_type=content_type)
+
+
+class FileView(View):
+    def get(self, request, url):
+        chunk_size = 1024 * 1024
+        file_path = '~/'
+        file_name = url.split('/')[-1]
+        file = file_path + file_name
+
+        def file_iter(file, chunk_size):
+            with open(file, 'rb') as fd:
+                while True:
+                    c = fd.read(chunk_size)
+                    if c:
+                        yield c
+                    else:
+                        break
+
+        response = StreamingHttpResponse(file_iter(file, chunk_size))
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="{}"'.format(file_name)  # 下载文件名
+        return response
