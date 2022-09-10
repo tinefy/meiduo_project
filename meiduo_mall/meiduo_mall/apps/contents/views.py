@@ -21,3 +21,21 @@ class IndexView(View):
             'contents': contents
         }
         return render(request, 'index.html', context=context)
+
+
+class ListView(View):
+    def get(self, request):
+        # # 查询商品频道和分类
+        # categories = get_categories()
+        # # 广告数据
+        # contents = {}
+        # content_categories = ContentCategory.objects.all()
+        # for category in content_categories:
+        #     # contents的value是对象 {'index_lbt': <QuerySet [<Content: 轮播图: 美图M8s>, <Content: 轮播图: 黑色星期五>]>}
+        #     contents[category.key] = category.content_set.filter(status=True).order_by('sequence')
+        # context = {
+        #     'categories': categories,
+        #     'contents': contents
+        # }
+        # return render(request, 'list.html', context=context)
+        return render(request, 'list.html')
