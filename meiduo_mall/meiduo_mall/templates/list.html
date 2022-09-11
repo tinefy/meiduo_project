@@ -79,28 +79,28 @@
       <div class="sub_menu_con fl">
         <h1 class="fl">商品分类</h1>
         <ul class="sub_menu">
-
-          <li>
-            <div class="level1">
-
-              <a href=""></a>
-
-            </div>
-            <div class="level2">
-
-              <div class="list_group">
-                <div class="group_name fl"> &gt;</div>
-                <div class="group_detail fl">
-
-                  <a href="/list//1/"></a>
-
-                </div>
+        {% for group in categories.values() %}
+        <li>
+          <div class="level1">
+            {% for level_1_channel in group['channels'] %}
+            <a href="{{ level_1_channel['url'] }}">{{ level_1_channel['name'] }}</a>
+            {% endfor %}
+          </div>
+          <div class="level2">
+            {% for level_2_item in group['sub_cats'] %}
+            <div class="list_group">
+              <div class="group_name fl">{{ level_2_item['name'] }} &gt;</div>
+              <div class="group_detail fl">
+                {% for level_3_item in level_2_item['sub_cats'] %}
+                <a href="list.html">{{ level_3_item['name'] }}</a>
+                {% endfor %}
               </div>
-
             </div>
-          </li>
-
-        </ul>
+            {% endfor %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
       </div>
       <ul class="navlist fl">
         <li><a href="">首页</a></li>
