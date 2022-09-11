@@ -212,14 +212,10 @@
       currentPage: 1,
       totalPage: 3,
       callback: function (current) {
-        {
-          #location.href = '/list/115/1/?sort=default';
-        #
-        }
-        {
-          #location.href = '/list/{{ category.id }}/' + current + '/?sort={{ sort }}';
-        #
-        }
+        // @formatter:off
+        {#location.href = '/list/115/1/?sort=default';#}
+        {#location.href = '/list/{{ category.id }}/' + current + '/?sort={{ sort }}';#}
+        // @formatter:on
       }
     })
   });

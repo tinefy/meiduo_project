@@ -14,22 +14,22 @@
 <body>
 <div id="app">
   <div class="header_con">
-    <div class="header" v-cloak>
+    <div class="header">
       <div class="welcome fl">欢迎来到美多商城!</div>
-      <div class="fr">
-        <div  class="login_btn fl">
+      <div class="fr" v-cloak>
+        <div v-if="username" class="login_btn fl">
           欢迎您：<em>[[ username ]]</em>
           <span>|</span>
-          <a href="">退出</a>
+          <a href="{{ url('users:logout') }}" class="quit">退出</a>
         </div>
-        <div >
-          <a href="">登录</a>
+        <div v-else class="login_btn fl">
+          <a href="{{ url('users:login') }}">登录</a>
           <span>|</span>
-          <a href="">注册</a>
+          <a href="{{ url('users:register') }}">注册</a>
         </div>
         <div class="user_link fl">
           <span>|</span>
-          <a href="">用户中心</a>
+          <a href="{{ url('users:info') }}">用户中心</a>
           <span>|</span>
           <a href="cart.html">我的购物车</a>
           <span>|</span>
@@ -39,7 +39,7 @@
     </div>
   </div>
   <div class="search_bar clearfix">
-    <a href="" class="logo fl"><img src=""></a>
+    <a href="index.html" class="logo fl"><img src="{{ static('images/logo.png') }}"></a>
     <div class="search_wrap fl">
       <form method="get" action="/search/" class="search_con">
         <input type="text" class="input_text fl" name="q" placeholder="搜索商品">
@@ -57,12 +57,12 @@
       <div class="goods_count fl" id="show_count">2</div>
       <ul class="cart_goods_show">
         <li>
-          <img src="" alt="商品图片">
+          <img src="../static/images/goods/goods001.jpg" alt="商品图片">
           <h4>华为 HUAWEI P10 Plus 6GB+64GB 钻雕金 移动联通电信4G手机 双卡双待</h4>
           <div>1</div>
         </li>
         <li>
-          <img src="" alt="商品图片">
+          <img src="../static/images/goods/goods002.jpg" alt="商品图片">
           <h4>Apple iPhoneX 64GB 深空灰色 移动联通电信4G手机</h4>
           <div>1</div>
         </li>
@@ -203,23 +203,19 @@
 <script type="text/javascript">
   let category_id = "";
 </script>
-<script type="text/javascript" src=""></script>
-<script type="text/javascript" src=""></script>
-<script type="text/javascript" src=""></script>
+<script type="text/javascript" src="{{ static('js/common.js') }}"></script>
+<script type="text/javascript" src="{{ static('js/list.js') }}"></script>
+<script type="text/javascript" src="{{ static('js/jquery.pagination.min.js') }}"></script>
 <script>
   $(function () {
     $('#pagination').pagination({
       currentPage: 1,
       totalPage: 3,
       callback: function (current) {
-        {
-          #location.href = '/list/115/1/?sort=default';
-        #
-        }
-        {
-          #location.href = '/list//' + current + '/?sort=';
-        #
-        }
+        // @formatter:off
+        {#location.href = '/list/115/1/?sort=default';#}
+        {#location.href = '/list/{{ category.id }}/' + current + '/?sort={{ sort }}';#}
+        // @formatter:on
       }
     })
   });
