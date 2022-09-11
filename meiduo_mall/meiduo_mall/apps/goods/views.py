@@ -11,7 +11,6 @@ from .utils import get_breadcrumb
 
 class ListView(View):
     def get(self, request, category_id, page_num):
-        # def get(self, request):
         try:
             category = GoodsCategory.objects.get(id=category_id)
         except GoodsCategory.DoesNotExist:
@@ -19,10 +18,9 @@ class ListView(View):
         # 查询商品频道和分类
         categories = get_categories()
         # 查询面包屑导航
-        breadcrumb = get_breadcrumb()
+        breadcrumb = get_breadcrumb(category)
         context = {
             'categories': categories,
-            # 'contents': contents
+            'breadcrumb': breadcrumb
         }
-        # return render(request, 'list.html', context=context)
         return render(request, 'list.html', context=context)
