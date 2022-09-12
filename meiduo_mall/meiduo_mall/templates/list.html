@@ -79,28 +79,28 @@
       <div class="sub_menu_con fl">
         <h1 class="fl">商品分类</h1>
         <ul class="sub_menu">
-        {% for group in categories.values() %}
-        <li>
-          <div class="level1">
-            {% for level_1_channel in group['channels'] %}
-            <a href="{{ level_1_channel['url'] }}">{{ level_1_channel['name'] }}</a>
-            {% endfor %}
-          </div>
-          <div class="level2">
-            {% for level_2_item in group['sub_cats'] %}
-            <div class="list_group">
-              <div class="group_name fl">{{ level_2_item['name'] }} &gt;</div>
-              <div class="group_detail fl">
-                {% for level_3_item in level_2_item['sub_cats'] %}
-                <a href="list.html">{{ level_3_item['name'] }}</a>
-                {% endfor %}
-              </div>
+          {% for group in categories.values() %}
+          <li>
+            <div class="level1">
+              {% for level_1_channel in group['channels'] %}
+              <a href="{{ level_1_channel['url'] }}">{{ level_1_channel['name'] }}</a>
+              {% endfor %}
             </div>
-            {% endfor %}
-          </div>
-        </li>
-        {% endfor %}
-      </ul>
+            <div class="level2">
+              {% for level_2_item in group['sub_cats'] %}
+              <div class="list_group">
+                <div class="group_name fl">{{ level_2_item['name'] }} &gt;</div>
+                <div class="group_detail fl">
+                  {% for level_3_item in level_2_item['sub_cats'] %}
+                  <a href="list.html">{{ level_3_item['name'] }}</a>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
       </div>
       <ul class="navlist fl">
         <li><a href="">首页</a></li>
@@ -112,11 +112,16 @@
     </div>
   </div>
   <div class="breadcrumb">
-    <a href="http://shouji.jd.com/"></a>
+    {% for category in breadcrumb.values() %}
+    {% if category != '' and category.parent == None %}
+    <a href="{{ category.goodschannel_set.all()[0].url }}">{{ category.name }}</a>
+    {% else %}
+    <a href="javascript:;">{{ category.name }}</a>
+    {% endif %}
+    {% if loop.index != loop.length %}
     <span>></span>
-    <a href="javascript:;"></a>
-    <span>></span>
-    <a href="javascript:;"></a>
+    {% endif %}
+    {% endfor %}
   </div>
   <div class="main_wrap clearfix">
     <div class="l_wrap fl clearfix">

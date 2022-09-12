@@ -21,6 +21,6 @@ class ListView(View):
         breadcrumb = get_breadcrumb(category)
         context = {
             'categories': categories,
-            'breadcrumb': breadcrumb
+            'breadcrumb': breadcrumb,
         }
         return render(request, 'list.html', context=context)
