@@ -198,19 +198,15 @@
 <script type="text/javascript" src="{{ static('js/list.js') }}"></script>
 <script type="text/javascript" src="{{ static('js/jquery.pagination.min.js') }}"></script>
 <script>
-  $(function () {
-        $('#pagination').pagination(
-            // @formatter:off
-            {
-              currentPage: {{ page_num }},
-              totalPage: {{ total_page }},
-              callback: function (current) {
-                {# location.href = '/list/115/1/?sort=default'; #}
-                location.href = '/list/{{ category.id }}/' + current + '/?sort={{ sort }}';
-                }
-              }
-            // @formatter:on
-        )
+  $('#pagination').pagination(
+      {
+        // @formatter:off
+        currentPage: {{ page_num }},
+        totalPage: {{ total_page }},
+        callback: function (current) {
+          location.href = '/list/{{ category.id }}/' + current + '/?sort={{ sort }}';
+        },
+        // @formatter:on
       }
   )
 </script>
