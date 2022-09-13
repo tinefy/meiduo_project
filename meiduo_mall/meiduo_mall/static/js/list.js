@@ -5,5 +5,11 @@ let vm = new Vue(
         data: {
             username: getCookie('username'),
         },
+        methods:{
+            
+        },
+        mounted:function () {
+            
+        }
     }
 )

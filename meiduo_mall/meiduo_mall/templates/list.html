@@ -133,11 +133,6 @@
             <h4><a href="detail.html">360手机 N6 Pro 全网通 6GB+128GB 极夜黑</a></h4>
             <div class="price">￥3999.90</div>
           </li>
-          <li>
-            <a href="detail.html"><img src=""></a>
-            <h4><a href="detail.html">360手机 N6 Pro 全网通 6GB+128GB 极夜黑</a></h4>
-            <div class="price">￥1666.80</div>
-          </li>
         </ul>
       </div>
     </div>
@@ -199,15 +194,15 @@
 <script type="text/javascript" src="{{ static('js/jquery.pagination.min.js') }}"></script>
 <script>
   $('#pagination').pagination(
+      // @formatter:off
       {
-        // @formatter:off
         currentPage: {{ page_num }},
         totalPage: {{ total_page }},
         callback: function (current) {
           location.href = '/list/{{ category.id }}/' + current + '/?sort={{ sort }}';
         },
-        // @formatter:on
       }
+      // @formatter:on
   )
 </script>
 </body>

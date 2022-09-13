@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.views import View
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, JsonResponse
 from django.core.paginator import Paginator
 
 # Create your views here.
 from contents.utils import get_categories
+from meiduo_mall.utils.response_code import RETCODE
 
 from .models import GoodsCategory, SKU
 from .utils import get_breadcrumb
@@ -51,3 +52,11 @@ class ListView(View):
             'page_num': page_num,  # 当前页码
         }
         return render(request, 'list.html', context=context)
+
+
+class ListHotView(View):
+    def get(self, request, category_id):
+        hot_skus = []
+        json_data = {}
+
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'hot_skus': hot_skus})
