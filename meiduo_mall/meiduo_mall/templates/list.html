@@ -128,10 +128,10 @@
       <div class="new_goods">
         <h3>热销排行</h3>
         <ul>
-          <li>
-            <a href="detail.html"><img src=""></a>
-            <h4><a href="detail.html">360手机 N6 Pro 全网通 6GB+128GB 极夜黑</a></h4>
-            <div class="price">￥3999.90</div>
+          <li v-for="sku in hot_skus">
+            <a v-bind:href="sku.url"><img v-bind:src="'/' + sku.default_image"></a>
+            <h4><a v-bind:href="sku.url">[[ sku.name ]]</a></h4>
+            <div class="price">[[ sku.price ]]</div>
           </li>
         </ul>
       </div>
@@ -187,7 +187,7 @@
   </div>
 </div>
 <script type="text/javascript">
-  let category_id = "";
+  let category_id = "{{ category.id }}";
 </script>
 <script type="text/javascript" src="{{ static('js/common.js') }}"></script>
 <script type="text/javascript" src="{{ static('js/list.js') }}"></script>
