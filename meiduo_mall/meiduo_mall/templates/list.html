@@ -172,7 +172,7 @@
         </li>
         {% endfor %}
       </ul>
-      <div class="pagenation">
+      <div class="pagination">
         <div id="pagination" class="page"></div>
       </div>
     </div>
@@ -198,11 +198,21 @@
 <script type="text/javascript" src="{{ static('js/list.js') }}"></script>
 <script type="text/javascript" src="{{ static('js/jquery.pagination.min.js') }}"></script>
 <script>
-
-  // @formatter:off
-
-        // @formatter:on
-
+  $(function () {
+        $('#pagination').pagination(
+            // @formatter:off
+            {
+              currentPage: {{ page_num }},
+              totalPage: {{ total_page }},
+              callback: function (current) {
+                {# location.href = '/list/115/1/?sort=default'; #}
+                location.href = '/list/{{ category.id }}/' + current + '/?sort={{ sort }}';
+                }
+              }
+            // @formatter:on
+        )
+      }
+  )
 </script>
 </body>
 </html>
