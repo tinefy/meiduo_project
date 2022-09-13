@@ -54,7 +54,7 @@ class ListView(View):
         return render(request, 'list.html', context=context)
 
 
-class ListHotView(View):
+class ListHotGoodsView(View):
     def get(self, request, category_id):
         hot_skus = []
         json_data = {}

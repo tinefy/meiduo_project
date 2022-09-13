@@ -6,5 +6,5 @@ app_name = 'goods'
 
 urlpatterns = [
     re_path(r'^list/(?P<category_id>\d+)/(?P<page_num>\d+)/$', views.ListView.as_view(), name='list'),
-    re_path(r'^list/hot/(?P<category_id>\d+)/$', views.ListHotView.as_view(), name='list_hot'),
+    re_path(r'^list/hot/(?P<category_id>\d+)/$', views.ListHotGoodsView.as_view(), name='list_hot'),
 ]
