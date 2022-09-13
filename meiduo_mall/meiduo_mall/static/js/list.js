@@ -9,7 +9,7 @@ let vm = new Vue(
             
         },
         mounted:function () {
-            
+
         }
     }
 )

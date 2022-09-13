@@ -56,7 +56,18 @@ class ListView(View):
 
 class ListHotGoodsView(View):
     def get(self, request, category_id):
+        try:
+            category = GoodsCategory.objects.get(id=category_id)
+        except GoodsCategory.DoesNotExist:
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': 'GoodsCategory does not exist'})
         hot_skus = []
-        json_data = {}
-
+        skus = SKU.objects.filter(category=category, is_launched=True).order_by('-sales')[:2]
+        for sku in skus:
+            sku_dict = {}
+            sku_dict['id'] = sku.id
+            sku_dict['default_image'] = sku.default_image
+            sku_dict['name'] = sku.name
+            sku_dict['price'] = sku.price
+            hot_skus.append(sku_dict)
+        print(hot_skus)
         return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'hot_skus': hot_skus})
