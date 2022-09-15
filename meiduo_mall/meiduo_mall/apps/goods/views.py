@@ -77,4 +77,14 @@ class ListHotGoodsView(View):
 
 class DetailView(View):
     def get(self, request, sku_id):
-        return render(request, 'detail.html', context='')
+        sku = SKU.objects.get(id=sku_id)
+        category = sku.category
+        # 查询商品频道和分类
+        categories = get_categories()
+        # 查询面包屑导航
+        breadcrumb = get_breadcrumb(category)
+        context = {
+            'categories': categories,  # 频道分类
+            'breadcrumb': breadcrumb,  # 面包屑导航
+        }
+        return render(request, 'detail.html', context=context)
