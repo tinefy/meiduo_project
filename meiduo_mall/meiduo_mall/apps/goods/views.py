@@ -73,3 +73,8 @@ class ListHotGoodsView(View):
             hot_skus.append(sku_dict)
         print(hot_skus)
         return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'hot_skus': hot_skus})
+
+
+class DetailView(View):
+    def get(self, request, sku_id):
+        return render(request, 'detail.html', context='')
