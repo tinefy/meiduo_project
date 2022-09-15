@@ -11,6 +11,8 @@ from .models import GoodsCategory, SKU
 from .utils import get_breadcrumb
 from . import constants
 
+''' http://127.0.0.1:8000/list/115/1/?sort=default '''
+
 
 class ListView(View):
     def get(self, request, category_id, page_num):

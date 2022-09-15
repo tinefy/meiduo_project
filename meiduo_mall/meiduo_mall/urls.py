@@ -22,6 +22,7 @@ from meiduo_mall.utils import views as contents_views
 urlpatterns = [
     path('favicon.ico', RedirectView.as_view(url='static/favicon.ico')),
     path('admin/', admin.site.urls),
+    path('search/', include('haystack.urls')),
     path('', include('users.urls', namespace='users')),
     path('', include('contents.urls', namespace='contents')),
     path('', include('goods.urls', namespace='goods')),

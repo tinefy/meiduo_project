@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<!--    aystack返回的数据包括：-->
+
+<!--    query：搜索关键字-->
+<!--    paginator：分页paginator对象-->
+<!--    page：当前页的page对象（遍历page中的对象，可以得到result对象）-->
+<!--    result.objects: 当前遍历出来的SKU对象。-->
+
+<div class="main_wrap clearfix">
+    <div class=" clearfix">
+        <ul class="goods_type_list clearfix">
+            {% for result in page.object_list %}
+            <li>
+                {# object取得才是sku对象 #}
+                <a href="/detail/{{ result.object.id }}/"><img src="/{{ result.object.default_image }}"></a>
+                <h4><a href="/detail/{{ result.object.id }}/">{{ result.object.name }}</a></h4>
+                <div class="operate">
+                    <span class="price">￥{{ result.object.price }}</span>
+                    <span>{{ result.object.comments }}评价</span>
+                </div>
+            </li>
+            {% else %}
+                <p>没有找到您要查询的商品。</p>
+            {% endfor %}
+        </ul>
+        <div class="pagenation">
+            <div id="pagination" class="page"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

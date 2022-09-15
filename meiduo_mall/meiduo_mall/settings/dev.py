@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'haystack',
     'users.apps.UsersConfig',
     'contents.apps.ContentsConfig',
     'verifications.apps.VerificationsConfig',
@@ -234,3 +235,15 @@ EMAIL_HOST_PASSWORD = 'egMQru3cw3nGe'  # 邮箱授权时获得的密码，非注
 EMAIL_FROM = '美多ifold<test@ifold.cf>'  # 发件人抬头
 
 SITE_URL = 'http://127.0.0.1:8000'
+
+# Haystack
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch7_backend.Elasticsearch7SearchEngine',
+        'URL': 'http://127.0.0.1:9200/',  # Elasticsearch服务器ip地址，端口号固定为9200
+        'INDEX_NAME': 'meiduo_mall',  # Elasticsearch建立的索引库的名称
+    },
+}
+
+# 当添加、修改、删除数据时，自动生成索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
