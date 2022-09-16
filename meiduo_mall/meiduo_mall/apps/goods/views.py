@@ -77,7 +77,11 @@ class ListHotGoodsView(View):
 
 class DetailView(View):
     def get(self, request, sku_id):
-        sku = SKU.objects.get(id=sku_id)
+        # 获取当前sku的信息
+        try:
+            sku = SKU.objects.get(id=sku_id)
+        except SKU.DoesNotExist:
+            return render(request, '404.html')
         category = sku.category
         # 查询商品频道和分类
         categories = get_categories()
@@ -86,5 +90,6 @@ class DetailView(View):
         context = {
             'categories': categories,  # 频道分类
             'breadcrumb': breadcrumb,  # 面包屑导航
+            'sku': sku,
         }
         return render(request, 'detail.html', context=context)
