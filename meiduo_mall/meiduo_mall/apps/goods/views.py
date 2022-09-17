@@ -87,6 +87,42 @@ class DetailView(View):
         categories = get_categories()
         # 查询面包屑导航
         breadcrumb = get_breadcrumb(category)
+
+        # 构建当前商品的规格键
+        # return '%s: %s - %s' % (self.sku, self.spec.name, self.option.value)
+        # <QuerySet [<SKUSpecification: 1: Apple MacBook Pro 13.3英寸笔记本 银色: 屏幕尺寸 - 13.3英寸>, ...]>
+        sku_specs = sku.skuspecification_set.order_by('spec_id')
+        sku_spec_key = []
+        for sku_spec in sku_specs:
+            sku_spec_key.append(sku_spec.option.id)  # SpecificationOption
+
+        # 获取当前商品的所有SKU
+        skus = sku.spu.sku_set.all()
+        # spec_sku_map {(1, 4, 7): 1, (1, 3, 7): 2}
+        spec_sku_map = {}
+        for sku_item in skus:
+            sku_item_specs = sku_item.skuspecification_set.order_by('spec_id')
+            sku_item_spec_key = []
+            for sku_item_spec in sku_item_specs:
+                sku_item_spec_key.append(sku_item_spec.option.id)
+            spec_sku_map[tuple(sku_item_spec_key)] = sku_item.id
+
+        # 获取当前商品的规格信息
+        sku_spu_spec = sku.spu.spuspecification_set.order_by('id')
+
+        if len(sku_spec_key) < len(sku_spu_spec):
+            return
+
+        for index, spec in enumerate(sku_spu_spec):
+            # key = sku_spec_key.copy()
+            key = sku_spec_key[:]
+            spec_options = spec.specificationoption_set.all()
+            for spec_option in spec_options:
+                key[index] = spec_option.id
+                print(spec_sku_map[tuple(key)])
+                spec_option.sku_id_added_attr = spec_sku_map[tuple([1])]
+            spec.spec_options_added_attr = spec_options
+
         context = {
             'categories': categories,  # 频道分类
             'breadcrumb': breadcrumb,  # 面包屑导航

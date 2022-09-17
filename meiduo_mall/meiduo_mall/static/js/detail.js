@@ -6,6 +6,7 @@ let vm = new Vue(
             username: getCookie('username'),
 
             category_id: category_id,
+            sku_price: sku_price,
         },
         methods: {
 
