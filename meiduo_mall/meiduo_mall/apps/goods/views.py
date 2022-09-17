@@ -88,44 +88,47 @@ class DetailView(View):
         # 查询面包屑导航
         breadcrumb = get_breadcrumb(category)
 
-        # 构建当前商品的规格键
-        # return '%s: %s - %s' % (self.sku, self.spec.name, self.option.value)
-        # <QuerySet [<SKUSpecification: 1: Apple MacBook Pro 13.3英寸笔记本 银色: 屏幕尺寸 - 13.3英寸>, ...]>
+        # 当前商品的所有规格 <QuerySet [<SKUSpecification: 1: Apple MacBook Pro 13.3英寸笔记本 银色: 屏幕尺寸 - 13.3英寸>, ...]>
         sku_specs = sku.skuspecification_set.order_by('spec_id')
-        sku_spec_key = []
+        # 构建当前商品的规格选项键，列表的每一项为规格选项信息(例如 ”13.3英寸“)的id
+        sku_specs_key = []
         for sku_spec in sku_specs:
-            sku_spec_key.append(sku_spec.option.id)  # SpecificationOption
+            sku_specs_key.append(sku_spec.option.id)  # SpecificationOption
 
         # 获取当前商品的所有SKU
         skus = sku.spu.sku_set.all()
-        # spec_sku_map {(1, 4, 7): 1, (1, 3, 7): 2}
+        # 构建所有sku字典，每一个sku id(value)对应所有的规格选项信息的id(key) spec_sku_map {(1, 4, 7): 1, (1, 3, 7): 2}
         spec_sku_map = {}
         for sku_item in skus:
+            # 每一个SKU的所有规格
             sku_item_specs = sku_item.skuspecification_set.order_by('spec_id')
+            # 每一个SKU的规格选项键，列表的每一项为规格选项信息的id
             sku_item_spec_key = []
             for sku_item_spec in sku_item_specs:
                 sku_item_spec_key.append(sku_item_spec.option.id)
+            # key:每一个SKU的所有规格选项信息的id value:每一个SKU的id
             spec_sku_map[tuple(sku_item_spec_key)] = sku_item.id
 
-        # 获取当前商品的规格信息
-        sku_spu_spec = sku.spu.spuspecification_set.order_by('id')
-
-        if len(sku_spec_key) < len(sku_spu_spec):
-            return
-
-        for index, spec in enumerate(sku_spu_spec):
+        # 获取当前商品的规格选项(例如 ”屏幕尺寸“) <QuerySet [<SPUSpecification: Apple MacBook Pro 笔记本: 屏幕尺寸>,...]>
+        sku_spu_specs = sku.spu.spuspecification_set.order_by('id')
+        # 若当前sku的规格选项少于spu规格选项，则信息不完整，则不再继续
+        if len(sku_specs_key) < len(sku_spu_specs):
+            return HttpResponseNotFound('当前商品sku的规格信息不完整')
+        for index, sku_spu_spec in enumerate(sku_spu_specs):
             # key = sku_spec_key.copy()
-            key = sku_spec_key[:]
-            spec_options = spec.specificationoption_set.all()
-            for spec_option in spec_options:
-                key[index] = spec_option.id
-                print(spec_sku_map[tuple(key)])
-                spec_option.sku_id_added_attr = spec_sku_map[tuple([1])]
-            spec.spec_options_added_attr = spec_options
+            key = sku_specs_key[:]
+            # 该规格选项的所有选项信息
+            sku_spu_spec_options = sku_spu_spec.specificationoption_set.all()
+            for sku_spu_spec_option in sku_spu_spec_options:
+                key[index] = sku_spu_spec_option.id
+                # dict.get(a) a不存在时返回None,dict[a] a不存在时报错
+                sku_spu_spec_option.sku_id_added_attr = spec_sku_map.get(tuple(key))
+            sku_spu_spec.spec_options_added_attr = sku_spu_spec_options
 
         context = {
             'categories': categories,  # 频道分类
             'breadcrumb': breadcrumb,  # 面包屑导航
             'sku': sku,
+            'spec': sku_spu_spec,
         }
         return render(request, 'detail.html', context=context)
