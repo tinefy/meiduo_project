@@ -122,7 +122,7 @@
     {% endfor %}
   </div>
   <div class="goods_detail_con clearfix">
-    <div class="goods_detail_pic fl"><img src=""></div>
+    <div class="goods_detail_pic fl"><img src="/{{ sku.default_image }}"></div>
     <div class="goods_detail_list fr">
       <h3>{{ sku.name }}</h3>
       <p>{{ sku.caption }}</p>
@@ -138,9 +138,9 @@
           <a v-on:click="sku_count_minus" class="minus fr">-</a>
         </div>
       </div>
-
+      {% for spec in specs %}
       <div class="type_select">
-        <label>:</label>
+        <label>{{ spec.name }}:</label>
 
 
         <a href="javascriptselect"></a>
@@ -163,40 +163,40 @@
       <div class="new_goods">
         <h3>热销排行</h3>
         <ul>
-          <li>
-            <a><img></a>
-            <h4><a>[[ ]]</a></h4>
-            <div class="price">￥[[ ]]</div>
+          <li v-for="sku in hot_skus">
+            <a v-bind:href="sku.url"><img v-bind:src="'/' + sku.default_image"></a>
+            <h4><a v-bind:href="sku.url">[[ sku.name ]]</a></h4>
+            <div class="price">[[ sku.price ]]</div>
           </li>
         </ul>
       </div>
     </div>
     <div class="r_wrap fr clearfix">
       <ul class="detail_tab clearfix">
-        <li>商品详情</li>
-        <li>规格与包装</li>
-        <li>售后服务</li>
-        <li>商品评价(18)</li>
+        <li v-bind:class="tab_content.detail ? 'active' : ''" v-on:click="show_tab_content('detail')">商品详情</li>
+        <li v-bind:class="tab_content.pack ? 'active' : ''" v-on:click="show_tab_content('pack')">规格与包装</li>
+        <li v-bind:class="tab_content.service ? 'active' : ''" v-on:click="show_tab_content('service')">售后服务</li>
+        <li v-bind:class="tab_content.comment ? 'active' : ''" v-on:click="show_tab_content('comment')">商品评价(18)</li>
       </ul>
-      <div class="tab_content">
+      <div v-bind:class="tab_content.detail ? 'current' : ''" class="tab_content">
         <dl>
           <dt>商品详情：</dt>
-          <dd></dd>
+          <dd>{{ sku.spu.desc_detail | safe }}</dd>
         </dl>
       </div>
-      <div class="tab_content">
+      <div v-bind:class="tab_content.pack ? 'current' : ''" class="tab_content">
         <dl>
           <dt>规格与包装：</dt>
-          <dd></dd>
+          <dd>{{ sku.spu.desc_pack | safe }}</dd>
         </dl>
       </div>
-      <div class="tab_content">
+      <div v-bind:class="tab_content.service ? 'current' : ''" class="tab_content">
         <dl>
           <dt>售后服务：</dt>
-          <dd></dd>
+          <dd>{{ sku.spu.desc_service | safe }}</dd>
         </dl>
       </div>
-      <div class="tab_content">
+      <div v-bind:class="tab_content.comment ? 'current' : ''" class="tab_content">
         <ul class="judge_list_con">
           <li class="judge_list fl">
             <div class="user_info fl">

@@ -5,11 +5,19 @@ let vm = new Vue(
         data: {
             username: getCookie('username'),
 
+            hot_skus: [],
+
             category_id: category_id,
             sku_price: sku_price,
             sku_count: 1,
             sku_amount: sku_price,
 
+            tab_content: {
+                detail: true,
+                pack: false,
+                service: false,
+                comment: false,
+            }
         },
         methods: {
             check_sku_count: function () {
@@ -29,6 +37,35 @@ let vm = new Vue(
                     this.sku_count--;
                 }
             },
+            show_tab_content: function (tab) {
+                let keys = Object.keys(this.tab_content);
+                for (let index in keys) {
+                    if (keys[index] === tab) {
+                        this.tab_content[keys[index]] = true;
+                    } else {
+                        this.tab_content[keys[index]] = false;
+                    }
+                }
+            },
+            get_hot_skus: function () {
+                if (this.category_id) {
+                    let url = '/list/hot/' + this.category_id + '/';
+                    axios.get(
+                        url, {responseType: 'json'}
+                    ).then(
+                        response => {
+                            this.hot_skus = response.data.hot_skus;
+                            for (let i = 0; i < this.hot_skus.length; i++) {
+                                this.hot_skus[i].url = '/detail/' + this.hot_skus[i].id + '/';
+                            }
+                        }
+                    ).catch(
+                        error => {
+                            console.log(error.response);
+                        }
+                    )
+                }
+            },
         },
         watch: {
             sku_count: {
@@ -37,6 +74,9 @@ let vm = new Vue(
                 },
                 immediate: true,
             },
+        },
+        mounted: function () {
+            this.get_hot_skus();
         },
     }
 )

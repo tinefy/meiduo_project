@@ -189,6 +189,6 @@ class DetailView(View):
             'categories': categories,  # 频道分类
             'breadcrumb': breadcrumb,  # 面包屑导航
             'sku': sku,
-            'spec': spu_spuspecs,
+            'specs': spu_spuspecs,
         }
         return render(request, 'detail.html', context=context)
