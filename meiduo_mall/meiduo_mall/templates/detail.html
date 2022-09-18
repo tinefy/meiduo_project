@@ -6,6 +6,11 @@
   <title>美多商城-商品详情</title>
   <link rel="stylesheet" type="text/css" href="{{ static('css/reset.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ static('css/main.css') }}">
+  <style type="text/css">
+    .add, .minus {
+      cursor: pointer;
+    }
+  </style>
   <script type="text/javascript" src="{{ static('js/vue-2.5.16.js') }}"></script>
   <script type="text/javascript" src="{{ static('js/axios-0.18.0.min.js') }}"></script>
 </head>
@@ -128,9 +133,9 @@
       <div class="goods_num clearfix">
         <div class="num_name fl">数 量：</div>
         <div class="num_add fl">
-          <input type="text" class="num_show fl">
-          <a class="add fr">+</a>
-          <a class="minus fr">-</a>
+          <input v-model="sku_count" v-on:blur="check_sku_count" type="text" class="num_show fl">
+          <a v-on:click="sku_count_add" class="add fr">+</a>
+          <a v-on:click="sku_count_minus" class="minus fr">-</a>
         </div>
       </div>
 
