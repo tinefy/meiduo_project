@@ -8,6 +8,7 @@ let vm = new Vue(
             category_id: category_id,
             sku_price: sku_price,
             sku_count: 1,
+            sku_amount: sku_price,
 
         },
         methods: {
@@ -27,6 +28,14 @@ let vm = new Vue(
                 if (this.sku_count > 1) {
                     this.sku_count--;
                 }
+            },
+        },
+        watch: {
+            sku_count: {
+                handler: function () {
+                    this.sku_amount = (this.sku_count * this.sku_price).toFixed(2);
+                },
+                immediate: true,
             },
         },
     }
