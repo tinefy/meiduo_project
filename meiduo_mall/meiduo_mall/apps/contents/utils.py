@@ -4,7 +4,7 @@ from goods.models import GoodsChannel
 def get_categories():
     """查询商品频道和分类"""
     # categories = OrderedDict()
-    categories = dict()
+    categories = {}
     channels = GoodsChannel.objects.order_by('group_id', 'sequence')
     for channel in channels:
         group_id = channel.group_id

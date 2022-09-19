@@ -162,7 +162,6 @@ class UserInfoPasswordView(LoginRequiredJSONMixin, View):
 
     def put(self, request):
         password_data_dict = json.loads(request.body.decode())
-        print(password_data_dict)
 
         for key, value in password_data_dict.items():
             # 将key转为变量名并让key=value
@@ -327,7 +326,6 @@ class UserAddressView(LoginRequiredMixin, View):
 class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
     def get_and_check_address_data_dict(self, request):
         address_data_dict = json.loads(request.body.decode())
-        print(address_data_dict)
 
         for key, value in address_data_dict.items():
             # 将key转为变量名并让key=value
@@ -392,11 +390,9 @@ class UserAddressCreateModifyView(LoginRequiredJSONMixin, View):
 
     def put(self, request, address_id):
         error_flag, address_data_dict = self.get_and_check_address_data_dict(request)
-        print(address_data_dict)
         pop_needless_key = ('id', 'province', 'city', 'district')
         for item in pop_needless_key:
             address_data_dict.pop(item)
-        print(address_data_dict)
         if error_flag:
             return
         try:
@@ -428,7 +424,6 @@ class UserAddressSetDefaultView(LoginRequiredJSONMixin, View):
             User.objects.filter(id=request.user.id).update(default_address=address_id)
         except Exception as e:
             logger.error(e)
-            print(e)
             return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '设置默认地址失败'})
         return JsonResponse({'code': RETCODE.OK, 'errmsg': '设置默认地址成功'})
 
@@ -445,7 +440,6 @@ class UserAddressSetTitleView(LoginRequiredJSONMixin, View):
                 Address.objects.filter(id=address_id).update(title=new_title)
             except Exception as e:
                 logger.error(e)
-                print(e)
                 return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '设置地址标题失败'})
             else:
                 title_dict = {'title': Address.objects.get(id=address_id).title}

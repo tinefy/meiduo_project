@@ -15,7 +15,7 @@ from . import constants
 
 
 class ListView(View):
-    def get(self, request, category_id, page_num):
+    def get(self, request, category_id, page_num=1):
         try:
             category = GoodsCategory.objects.get(id=category_id)
         except GoodsCategory.DoesNotExist:
@@ -71,7 +71,6 @@ class ListHotGoodsView(View):
             sku_dict['name'] = sku.name
             sku_dict['price'] = sku.price
             hot_skus.append(sku_dict)
-        print(hot_skus)
         return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'hot_skus': hot_skus})
 
 
