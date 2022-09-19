@@ -90,7 +90,7 @@
               <div class="group_name fl">{{ level_2_item['name'] }} &gt;</div>
               <div class="group_detail fl">
                 {% for level_3_item in level_2_item['sub_cats'] %}
-                <a href="list.html">{{ level_3_item['name'] }}</a>
+                <a href="/list/{{ level_3_item['id'] }}">{{ level_3_item['name'] }}</a>
                 {% endfor %}
               </div>
             </div>
