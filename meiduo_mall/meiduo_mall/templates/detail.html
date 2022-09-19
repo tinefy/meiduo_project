@@ -141,17 +141,17 @@
       {% for spec in specs %}
       <div class="type_select">
         <label>{{ spec.name }}:</label>
-
-
-        <a href="javascriptselect"></a>
-
-        <a href=""></a>
-
-        <a href="javascript:;"></a>
-
-
+        {% for option in spec.spuspec_options_added_attr %}
+        {% if option.sku_id_added_attr == sku.id %}
+        <a href="javascript:;" class="select">{{ option.value }}</a>
+        {% elif option.sku_id_added_attr %}
+        <a href="{{ url('goods:detail', args=(option.sku_id_added_attr,)) }}">{{ option.value }}</a>
+        {% else %}
+        <a href="javascript:;">{{ option.value }}</a>
+        {% endif %}
+        {% endfor %}
       </div>
-
+      {% endfor %}
       <div class="total">总价：<em>[[ sku_amount ]]元</em></div>
       <div class="operate_btn">
         <a class="add_cart" id="add_cart">加入购物车</a>
@@ -176,7 +176,8 @@
         <li v-bind:class="tab_content.detail ? 'active' : ''" v-on:click="show_tab_content('detail')">商品详情</li>
         <li v-bind:class="tab_content.pack ? 'active' : ''" v-on:click="show_tab_content('pack')">规格与包装</li>
         <li v-bind:class="tab_content.service ? 'active' : ''" v-on:click="show_tab_content('service')">售后服务</li>
-        <li v-bind:class="tab_content.comment ? 'active' : ''" v-on:click="show_tab_content('comment')">商品评价(18)</li>
+        <li v-bind:class="tab_content.comment ? 'active' : ''" v-on:click="show_tab_content('comment')">商品评价(18)
+        </li>
       </ul>
       <div v-bind:class="tab_content.detail ? 'current' : ''" class="tab_content">
         <dl>
