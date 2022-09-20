@@ -191,3 +191,9 @@ class DetailView(View):
             'specs': spu_spuspecs,
         }
         return render(request, 'detail.html', context=context)
+
+
+class VisitCountView(View):
+    """详情页分类商品访问量"""
+    def post(self, request, category_id):
+        return
