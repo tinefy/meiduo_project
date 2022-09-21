@@ -202,7 +202,7 @@ class DetailView(View):
 class VisitCountView(View):
     """详情页分类商品访问量"""
 
-    def get(self, request, category_id):
+    def post(self, request, category_id):
         try:
             category = GoodsCategory.objects.get(id=category_id)
         except GoodsCategory.DoesNotExist:
@@ -210,6 +210,7 @@ class VisitCountView(View):
         time_ = timezone.localtime()
         today_date_str = '%d-%02d-%02d' % (time_.year, time_.month, time_.day)
         today_date = datetime.datetime.strptime(today_date_str, '%Y-%m-%d')
+        count_data = None
         try:
             count_data = category.goodsvisitcount_set.get(date=today_date)
         except GoodsVisitCount.DoesNotExist:
