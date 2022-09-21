@@ -453,8 +453,23 @@ class UserAddressSetTitleView(LoginRequiredJSONMixin, View):
 
 class UserBrowseHistory(LoginRequiredJSONMixin, View):
     def get(self, request):
+        user_id = request.user.id
+        redis_conn = get_redis_connection('history')
+        sku_ids = redis_conn.lrange(f'history_{user_id}', 0, -1)
 
-        return JsonResponse({'code': RETCODE.OK, 'errmsg': '新标题为空，保持原地址标题', 'title': ''})
+        skus = []
+        for sku_id in sku_ids:
+            sku = SKU.objects.get(id=sku_id)
+            skus.append(
+                {
+                    'id': sku.id,
+                    'name': sku.name,
+                    'default_image': sku.default_image,
+                    'price': sku.price
+                }
+            )
+
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'skus': skus})
 
     def post(self, request):
         json_dict = json.loads(request.body.decode())

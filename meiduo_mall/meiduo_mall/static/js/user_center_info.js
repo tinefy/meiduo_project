@@ -13,10 +13,8 @@ let vm = new Vue(
             set_email: false,
             send_email_btn_disabled: false,
             send_email_tip: '重新发送验证邮件',
-        },
-        mounted: function () {
-            this.email_active = (this.email_active == 'True') ? true : false;
-            this.set_email = (this.email == '') ? true : false;
+
+            browse_histories: []
         },
         methods: {
             check_email: function () {
@@ -60,9 +58,28 @@ let vm = new Vue(
                 }
             },
             cancel_email: function () {
-                this.email='';
-                this.error_email=false;
+                this.email = '';
+                this.error_email = false;
             },
+            get_browse_histories: function () {
+                let url = '/browse_histories/';
+                axios.get(
+                    url, {responseType: 'json'}
+                ).then(
+                    response => {
+                        this.browse_histories = response.data.skus;
+                    }
+                ).catch(
+                    error => {
+                        alert(error.response)
+                    }
+                )
+            },
+        },
+        mounted: function () {
+            this.email_active = (this.email_active == 'True') ? true : false;
+            this.set_email = (this.email == '') ? true : false;
+            this.get_browse_histories()
         },
     }
 )

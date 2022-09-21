@@ -8,6 +8,7 @@ let vm = new Vue(
             hot_skus: [],
 
             category_id: category_id,
+            sku_id: sku_id,
             sku_price: sku_price,
             sku_count: 1,
             sku_amount: sku_price,
@@ -66,6 +67,46 @@ let vm = new Vue(
                     )
                 }
             },
+            post_browse_history: function () {
+                let url = '/browse_histories/';
+                axios.post(
+                    url, {
+                        'sku_id': this.sku_id
+                    }, {
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        responseType: 'json'
+                    }
+                ).then(
+                    response => {
+                        console.log(response.data);
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response)
+                    }
+                )
+            },
+            post_visit_count: function () {
+                let url = '/visit/' + this.category_id + '/';
+                axios.post(
+                    url, {}, {
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        responseType: 'json'
+                    }
+                ).then(
+                    response => {
+                        console.log(response.data);
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response)
+                    }
+                )
+            },
         },
         watch: {
             sku_count: {
@@ -77,6 +118,8 @@ let vm = new Vue(
         },
         mounted: function () {
             this.get_hot_skus();
+            this.post_browse_history();
+            this.post_visit_count();
         },
     }
 )
