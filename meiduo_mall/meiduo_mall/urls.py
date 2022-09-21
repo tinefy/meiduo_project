@@ -29,5 +29,6 @@ urlpatterns = [
     path('', include('verifications.urls', namespace='verifications')),
     path('', include('oauth.urls', namespace='oauth')),
     path('', include('areas.urls', namespace='areas')),
+    path('', include('carts.urls', namespace='carts')),
     re_path(r'(?P<fastdfs>^group\d+?/.*?$)', contents_views.FastDFSView.as_view()),
 ]
