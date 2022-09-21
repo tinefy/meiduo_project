@@ -1,17 +1,23 @@
+import datetime
+import logging
+
 from django.shortcuts import render
 from django.views import View
-from django.http import HttpResponseNotFound, JsonResponse
+from django.http import HttpResponseNotFound, JsonResponse, HttpResponseServerError
 from django.core.paginator import Paginator
+from django.utils import timezone
 
 # Create your views here.
 from contents.utils import get_categories
 from meiduo_mall.utils.response_code import RETCODE
 
-from .models import GoodsCategory, SKU
+from .models import GoodsCategory, SKU, GoodsVisitCount
 from .utils import get_breadcrumb
 from . import constants
 
 ''' http://127.0.0.1:8000/list/115/1/?sort=default '''
+
+logger = logging.Logger('django')
 
 
 class ListView(View):
@@ -195,5 +201,25 @@ class DetailView(View):
 
 class VisitCountView(View):
     """详情页分类商品访问量"""
-    def post(self, request, category_id):
-        return
+
+    def get(self, request, category_id):
+        try:
+            category = GoodsCategory.objects.get(id=category_id)
+        except GoodsCategory.DoesNotExist:
+            return HttpResponseNotFound('GoodsCategory ID missing or does not exist')
+        time_ = timezone.localtime()
+        today_date_str = '%d-%02d-%02d' % (time_.year, time_.month, time_.day)
+        today_date = datetime.datetime.strptime(today_date_str, '%Y-%m-%d')
+        try:
+            count_data = category.goodsvisitcount_set.get(date=today_date)
+        except GoodsVisitCount.DoesNotExist:
+            count_data = GoodsVisitCount()
+            count_data.category = category
+        finally:
+            count_data.count += 1
+            try:
+                count_data.save()
+            except Exception as e:
+                logger.error(e)
+                return HttpResponseServerError('数据库服务异常')
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK'})
