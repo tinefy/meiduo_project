@@ -7,25 +7,27 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core import signing
 from django.core.mail import send_mail
-from django.http import HttpResponseForbidden, HttpResponse, JsonResponse, HttpResponseBadRequest, \
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, HttpResponseBadRequest, \
     HttpResponseServerError
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, authenticate, logout
 from django.urls import reverse
 from django.views import View
-# from django.contrib.auth.models import User
+
+from django_redis import get_redis_connection
 
 from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.apps.verifications.views import CheckSMSCodeView
 from meiduo_mall.utils.views import LoginRequiredJSONMixin
+
+from goods.models import SKU
+
 from . import constants
 from .models import Address
 
-# from meiduo_mall.apps.users.utils import UsernameMobileAuthBackend
-
 # Create your views here.
 
-
+# 获取当前用户模型类
 User = get_user_model()
 # 用户名：mduser
 # 密码: eSJUgKnDne
@@ -447,3 +449,29 @@ class UserAddressSetTitleView(LoginRequiredJSONMixin, View):
         else:
             title_dict = {'title': Address.objects.get(id=address_id).title}
             return JsonResponse({'code': RETCODE.OK, 'errmsg': '新标题为空，保持原地址标题', 'title': title_dict})
+
+
+class UserBrowseHistory(LoginRequiredJSONMixin, View):
+    def get(self, request):
+
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': '新标题为空，保持原地址标题', 'title': ''})
+
+    def post(self, request):
+        json_dict = json.loads(request.body.decode())
+        sku_id = json_dict['sku_id']
+        try:
+            SKU.objects.get(id=sku_id)
+        except SKU.DoesNotExist:
+            return HttpResponseForbidden('sku不存在')
+
+        user_id = request.user.id
+
+        redis_conn = get_redis_connection('history')
+        redis_pl = redis_conn.pipeline()
+        # 去重-存储-修剪
+        redis_pl.lrem(f'history_{user_id}', 0, sku_id)
+        redis_pl.lpush(f'history_{user_id}', sku_id)
+        redis_pl.ltrim(f'history_{user_id}', 0, 4)
+        redis_pl.execute()
+
+        return JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK'})

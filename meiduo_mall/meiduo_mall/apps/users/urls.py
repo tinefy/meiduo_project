@@ -26,4 +26,5 @@ urlpatterns = [
             name='address_set_default'),
     re_path(r'^address/(?P<address_id>\d+)/set/title/$', views.UserAddressSetTitleView.as_view(),
             name='address_set_default'),
+    re_path(r'^browse_histories/$', views.UserBrowseHistory.as_view(), name='browse_histories'),
 ]

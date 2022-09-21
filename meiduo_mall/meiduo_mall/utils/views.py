@@ -1,6 +1,6 @@
 # LoginRequiredJSONMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse, StreamingHttpResponse
+from django.http import JsonResponse
 
 from meiduo_mall.utils.response_code import RETCODE
 
