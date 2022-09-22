@@ -1,10 +1,13 @@
+import base64
 import json
+import pickle
 
 from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import render
 from django.views import View
 from django_redis import get_redis_connection
 
+from carts import constants
 from goods.models import SKU
 from meiduo_mall.utils.response_code import RETCODE
 
@@ -43,8 +46,8 @@ class CartsView(View):
         if user.is_authenticated:
             # 用户已登录，操作redis购物车
             redis_conn = get_redis_connection('carts')
-            get_count_in_redis = redis_conn.hget(f'carts_{user.id}', sku_id)
-            if (not get_count_in_redis and count >= 0) or (get_count_in_redis and (get_count_in_redis + count >= 0)):
+            origin_count = redis_conn.hget(f'carts_{user.id}', sku_id)
+            if (not origin_count and count >= 0) or (origin_count and (origin_count + count >= 0)):
                 redis_pipeline = redis_conn.pipeline()
                 redis_pipeline.hincrby(f'carts_{user.id}', sku_id, count)
                 if selected:
@@ -55,4 +58,24 @@ class CartsView(View):
             return JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功'})
         else:
             # 用户未登录，操作cookie购物车
-            pass
+            carts_str = request.COOKIES.get('cats')
+            # 如果用户操作过cookie购物车
+            if carts_str:
+                # 将cart_str转成bytes,再将bytes转成base64的bytes,最后将bytes转字典
+                carts_dict = pickle.loads(base64.b16decode(carts_str.endcode()))
+            # 用户从没有操作过cookie购物车
+            else:
+                carts_dict = {}
+            # 判断要加入购物车的商品是否已经在购物车中,如有相同商品，累加求和，反之，直接赋值
+            if sku_id in carts_dict:
+                origin_count = carts_dict[sku_id]['count']
+                count += origin_count
+            carts_dict[sku_id] = {
+                'count': count,
+                'selected': selected,
+            }
+            # 将字典转成bytes,再将bytes转成base64的bytes,最后将bytes转字符串
+            cookie_carts_str = base64.b64encode(pickle.dumps(carts_dict)).decode()
+            response = JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功'})
+            response.set_cookie('carts', cookie_carts_str, max_age=constants.CARTS_COOKIE_EXPIRES)
+            return response
