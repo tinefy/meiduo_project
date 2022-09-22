@@ -21,6 +21,49 @@ class CartsView(View):
     selected 	bool 	否 	是否勾选
     """
 
+    def get(self, request):
+        user = request.user
+        if user.is_authenticated:
+            # 用户已登录，查询redis购物车
+            redis_conn = get_redis_connection('carts')
+            carts_redis = redis_conn.hgetall(f'carts_{user.id}')
+            selected_redis = redis_conn.smembers(f'selected_{user.id}')
+            carts_dict = {}
+            for sku_id, count in carts_redis.items():
+                carts_dict[sku_id] = {
+                    'count': count,
+                    'selected': sku_id in selected_redis,
+                }
+        else:
+            # 用户未登录，查询cookies购物车
+            carts_str = request.COOKIES.get('cats')
+            # 如果用户操作过cookie购物车
+            if carts_str:
+                # 将cart_str转成bytes,再将bytes转成base64的bytes,最后将bytes转字典
+                carts_dict = pickle.loads(base64.b16decode(carts_str.endcode()))
+            # 用户从没有操作过cookie购物车
+            else:
+                carts_dict = {}
+        sku_ids = carts_dict.keys()
+        skus = SKU.objects.filter(id__in=sku_ids)
+        cart_skus = []
+        for sku in skus:
+            sku_count = carts_dict.get(sku.id).get('count')
+            sku_dict = {
+                'id': sku.id,
+                'name': sku.name,
+                'count': sku_count,
+                'selected': carts_dict.get(sku.id).get('selected'),
+                'default_image': sku.default_image,
+                'price': sku.price,
+                'amount': sku.price * sku_count,
+            }
+            cart_skus.append(sku_dict)
+        context = {
+            'cart_skus': cart_skus,
+        }
+        return render(request, 'cart.html', context=context)
+
     def post(self, request):
         json_dict = json.loads(request.body.decode())
         sku_id = json_dict.get('sku_id')
