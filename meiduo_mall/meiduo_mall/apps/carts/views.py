@@ -91,7 +91,10 @@ class CartsView(View):
         if user.is_authenticated:
             # 用户已登录，操作redis购物车
             redis_conn = get_redis_connection('carts')
-            origin_count = redis_conn.hget(f'carts_{user.id}', sku_id)
+            try:
+                origin_count = int(redis_conn.hget(f'carts_{user.id}', sku_id).decode())
+            except Exception:
+                origin_count = 0
             if (not origin_count and count >= 0) or (origin_count and (origin_count + count >= 0)):
                 redis_pipeline = redis_conn.pipeline()
                 redis_pipeline.hincrby(f'carts_{user.id}', sku_id, count)
