@@ -119,7 +119,7 @@ class CartsView(View):
             response.set_cookie('carts', cookie_carts_str, max_age=constants.CARTS_COOKIE_EXPIRES)
             return response
 
-    def put(self, request):
+    def put(self, request, select_all=None):
         json_dict = json.loads(request.body.decode())
         sku_id = json_dict.get('sku_id')
         count = json_dict.get('count')

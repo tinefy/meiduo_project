@@ -7,7 +7,7 @@
   <link rel="stylesheet" type="text/css" href="{{ static('css/reset.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ static('css/main.css') }}">
   <style type="text/css">
-    .add, .minus {
+    .add, .minus, .delete_goods {
       cursor: pointer;
     }
   </style>
@@ -94,10 +94,10 @@
       </div>
     </li>
     <li class="col07">[[ cart_sku.amount ]]元</li>
-    <li class="col08"><a v-on:click="delete_goods(index)">删除</a></li>
+    <li class="col08"><a v-on:click="delete_goods(index)" class="delete_goods">删除</a></li>
   </ul>
   <ul class="settlements" v-cloak>
-    <li class="col01"><input type="checkbox" name=""></li>
+    <li class="col01"><input type="checkbox" v-on:change="select_all" v-model="select_all_status" name=""></li>
     <li class="col02">全选</li>
     <li class="col03">合计(不含运费)：<span>¥</span><em>[[ total_selected_amount ]]</em>
       <br>共计<b>[[ total_selected_count ]]</b>件商品

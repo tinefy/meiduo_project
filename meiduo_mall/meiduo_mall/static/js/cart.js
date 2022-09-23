@@ -163,12 +163,64 @@ let vm = new Vue(
                     }
                 )
             },
+            select_all: function () {
+                let selected = !this.select_all_status;
+
+                let url = '/carts/selectall/';
+                axios.put(
+                    url, {
+                        sku_id: this.carts[index].id,
+                        count: this.carts[index].count,
+                        selected: this.carts[index].selected,
+                    }, {
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        responseType: 'json',
+                        // withCredentials: true,
+                    }
+                ).then(
+                    response => {
+                        if (response.data.code === '0') {
+                            for (let index in this.carts) {
+                                this.carts[index].selected = selected;
+                            }
+                            this.calculate_selected_total_and_amount();
+                            this.carts_temp = $.extend(true, {}, this.carts);
+                        } else {
+                            alert(response.data.errmsg);
+                            this.carts[index].selected = this.carts_temp[index].selected;
+                        }
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response);
+                        this.carts[index].selected = this.carts_temp[index].selected;
+                    }
+                )
+            },
         },
         mounted: function () {
             this.initialize_carts_data();
             this.calculate_total_count();
             this.calculate_selected_total_and_amount();
         },
-        watch: {},
+        computed: {
+            select_all_status: {
+                get: function () {
+                    let selected = true;
+                    for (let index in this.carts) {
+                        if (this.carts[index].selected === false) {
+                            selected = false;
+                            break;
+                        }
+                    }
+                    return selected;
+                },
+                // 解决 [Vue warn]: Computed property "xxx" was assigned to but it has no setter.
+                set: function () {
+                },
+            },
+        },
     }
 )
