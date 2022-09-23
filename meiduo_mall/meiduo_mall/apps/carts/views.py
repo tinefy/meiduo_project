@@ -30,8 +30,8 @@ class CartsView(View):
             selected_redis = redis_conn.smembers(f'selected_{user.id}')
             carts_dict = {}
             for sku_id, count in carts_redis.items():
-                carts_dict[sku_id] = {
-                    'count': count,
+                carts_dict[int(sku_id.decode())] = {
+                    'count': int(count.decode()),
                     'selected': sku_id in selected_redis,
                 }
         else:
@@ -44,6 +44,8 @@ class CartsView(View):
             # 用户从没有操作过cookie购物车
             else:
                 carts_dict = {}
+        print(carts_dict)
+        # 购物车渲染数据
         sku_ids = carts_dict.keys()
         skus = SKU.objects.filter(id__in=sku_ids)
         cart_skus = []
@@ -53,10 +55,10 @@ class CartsView(View):
                 'id': sku.id,
                 'name': sku.name,
                 'count': sku_count,
-                'selected': carts_dict.get(sku.id).get('selected'),
+                'selected': str(carts_dict.get(sku.id).get('selected')),
                 'default_image': sku.default_image,
-                'price': sku.price,
-                'amount': sku.price * sku_count,
+                'price': str(sku.price),
+                'amount': str(sku.price * sku_count),
             }
             cart_skus.append(sku_dict)
         context = {
@@ -68,7 +70,7 @@ class CartsView(View):
         json_dict = json.loads(request.body.decode())
         sku_id = json_dict.get('sku_id')
         count = json_dict.get('count')
-        selected = json_dict.get('selected')
+        selected = json_dict.get('selected', True)
 
         required = [sku_id, count]
         if not all(required):
@@ -97,7 +99,7 @@ class CartsView(View):
                     redis_pipeline.sadd(f'selected_{user.id}', sku_id)
                 redis_pipeline.execute()
             else:
-                return JsonResponse({'code': RETCODE.OK, 'errmsg': '参数count有误'})
+                return JsonResponse({'code': RETCODE.PARAMERR, 'errmsg': '参数count有误'})
             return JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功'})
         else:
             # 用户未登录，操作cookie购物车

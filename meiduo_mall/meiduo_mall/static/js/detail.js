@@ -107,6 +107,34 @@ let vm = new Vue(
                     }
                 )
             },
+            add_carts: function () {
+                let url = '/carts/';
+                axios.post(
+                    url, {
+                        sku_id: this.sku_id,
+                        count: this.sku_count,
+                        selected: true,
+                    }, {
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        responseType: 'json',
+                        // withCredentials: true,
+                    }
+                ).then(
+                    response => {
+                        if (response.data.code == '0'){
+                            alert('添加购物车成功');
+                        }else {
+                            alert(response.data.errmsg);
+                        }
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response)
+                    }
+                )
+            },
         },
         watch: {
             sku_count: {

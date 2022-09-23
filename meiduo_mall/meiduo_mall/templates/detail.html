@@ -7,7 +7,7 @@
   <link rel="stylesheet" type="text/css" href="{{ static('css/reset.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ static('css/main.css') }}">
   <style type="text/css">
-    .add, .minus {
+    .add, .minus .add_cart {
       cursor: pointer;
     }
   </style>
@@ -154,7 +154,7 @@
       {% endfor %}
       <div class="total">总价：<em>[[ sku_amount ]]元</em></div>
       <div class="operate_btn">
-        <a class="add_cart" id="add_cart">加入购物车</a>
+        <a v-on:click="add_carts" class="add_cart" id="add_cart">加入购物车</a>
       </div>
     </div>
   </div>
