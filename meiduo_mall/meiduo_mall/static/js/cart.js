@@ -39,15 +39,14 @@ let vm = new Vue(
                 }
                 this.total_selected_amount = this.total_selected_amount.toFixed(2);
             },
-            update_selected: function (index) {
-                this.calculate_selected_total_and_amount();
-            },
             check_sku_count: function (index) {
                 let count = 0;
                 if (this.carts[index].count > 5) {
-                    this.count = 5;
+                    count = 5;
                 } else if (this.carts[index].count < 1) {
-                    this.count = 1;
+                    count = 1;
+                } else {
+                    count = this.carts[index].count;
                 }
                 this.update_count(index, count);
             },
@@ -55,7 +54,7 @@ let vm = new Vue(
                 let count = 0;
                 if (this.carts[index].count < 5) {
                     count = this.carts[index].count + 1;
-                }else {
+                } else {
                     count = 5;
                 }
                 this.update_count(index, count);
@@ -64,7 +63,7 @@ let vm = new Vue(
                 let count = 0;
                 if (this.carts[index].count > 1) {
                     count = this.carts[index].count - 1;
-                }else {
+                } else {
                     count = 1;
                 }
                 this.update_count(index, count);
@@ -99,6 +98,68 @@ let vm = new Vue(
                     error => {
                         console.log(error.response);
                         this.carts[index].count = this.carts_temp[index].count;
+                    }
+                )
+            },
+            update_selected: function (index) {
+                let url = '/carts/';
+                axios.put(
+                    url, {
+                        sku_id: this.carts[index].id,
+                        count: this.carts[index].count,
+                        selected: this.carts[index].selected,
+                    }, {
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        responseType: 'json',
+                        // withCredentials: true,
+                    }
+                ).then(
+                    response => {
+                        if (response.data.code === '0') {
+                            // this.carts[index].selected = response.data.cart_sku.selected;
+                            this.calculate_selected_total_and_amount();
+                            this.carts_temp = $.extend(true, {}, this.carts);
+                        } else {
+                            alert(response.data.errmsg);
+                            this.carts[index].selected = this.carts_temp[index].selected;
+                        }
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response);
+                        this.carts[index].selected = this.carts_temp[index].selected;
+                    }
+                )
+            },
+            delete_goods: function (index) {
+                let url = '/carts/';
+                axios.delete(
+                    url, {
+                        data: {
+                            sku_id: this.carts[index].id,
+                        },
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        responseType: 'json',
+                        // withCredentials: true,
+                    }
+                ).then(
+                    response => {
+                        if (response.data.code === '0') {
+                            this.carts.splice(index, 1);
+                            this.calculate_total_count();
+                            this.calculate_selected_total_and_amount();
+                            this.carts_temp = $.extend(true, {}, this.carts);
+                        } else {
+                            alert(response.data.errmsg);
+                        }
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response);
                     }
                 )
             },
