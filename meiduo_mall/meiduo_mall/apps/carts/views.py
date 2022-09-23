@@ -44,7 +44,6 @@ class CartsView(View):
             # 用户从没有操作过cookie购物车
             else:
                 carts_dict = {}
-        print(carts_dict)
         # 购物车渲染数据
         sku_ids = carts_dict.keys()
         skus = SKU.objects.filter(id__in=sku_ids)
@@ -91,18 +90,11 @@ class CartsView(View):
         if user.is_authenticated:
             # 用户已登录，操作redis购物车
             redis_conn = get_redis_connection('carts')
-            try:
-                origin_count = int(redis_conn.hget(f'carts_{user.id}', sku_id).decode())
-            except Exception:
-                origin_count = 0
-            if (not origin_count and count >= 0) or (origin_count and (origin_count + count >= 0)):
-                redis_pipeline = redis_conn.pipeline()
-                redis_pipeline.hincrby(f'carts_{user.id}', sku_id, count)
-                if selected:
-                    redis_pipeline.sadd(f'selected_{user.id}', sku_id)
-                redis_pipeline.execute()
-            else:
-                return JsonResponse({'code': RETCODE.PARAMERR, 'errmsg': '参数count有误'})
+            redis_pipeline = redis_conn.pipeline()
+            redis_pipeline.hincrby(f'carts_{user.id}', sku_id, count)
+            if selected:
+                redis_pipeline.sadd(f'selected_{user.id}', sku_id)
+            redis_pipeline.execute()
             return JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功'})
         else:
             # 用户未登录，操作cookie购物车
@@ -127,6 +119,7 @@ class CartsView(View):
             response = JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功'})
             response.set_cookie('carts', cookie_carts_str, max_age=constants.CARTS_COOKIE_EXPIRES)
             return response
+
     def put(self, request):
         json_dict = json.loads(request.body.decode())
         sku_id = json_dict.get('sku_id')
@@ -138,7 +131,7 @@ class CartsView(View):
             return HttpResponseForbidden('缺少必传参数')
 
         try:
-            SKU.objects.get(id=sku_id)
+            sku = SKU.objects.get(id=sku_id)
         except SKU.DoesNotExist:
             return HttpResponseForbidden('商品不存在')
         try:
@@ -153,38 +146,55 @@ class CartsView(View):
             # 用户已登录，操作redis购物车
             redis_conn = get_redis_connection('carts')
             try:
-                origin_count = int(redis_conn.hget(f'carts_{user.id}', sku_id).decode())
+                int(redis_conn.hget(f'carts_{user.id}', sku_id).decode())
             except Exception:
                 return HttpResponseForbidden('用户或商品id不存在')
-            if origin_count + count >= 0:
-                redis_pipeline = redis_conn.pipeline()
-                redis_pipeline.hincrby(f'carts_{user.id}', sku_id, count)
-                if selected:
-                    redis_pipeline.sadd(f'selected_{user.id}', sku_id)
-                redis_pipeline.execute()
+            redis_pipeline = redis_conn.pipeline()
+            redis_pipeline.hset(f'carts_{user.id}', sku_id, count)
+            if selected:
+                redis_pipeline.sadd(f'selected_{user.id}', sku_id)
             else:
-                return JsonResponse({'code': RETCODE.PARAMERR, 'errmsg': '参数count有误'})
-            return JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功'})
+                redis_pipeline.srem(f'selected_{user.id}', sku_id)
+            redis_pipeline.execute()
+
+            cart_sku = {
+                'id': sku_id,
+                'name': sku.name,
+                'count': count,
+                'selected': selected,
+                'default_image': sku.default_image,
+                'price': str(sku.price),
+                'amount': str(sku.price * count),
+            }
+
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功', 'cart_sku': cart_sku})
         else:
             # 用户未登录，操作cookie购物车
             carts_str = request.COOKIES.get('cats')
-            # 如果用户操作过cookie购物车
             if carts_str:
                 # 将cart_str转成bytes,再将bytes转成base64的bytes,最后将bytes转字典
                 carts_dict = pickle.loads(base64.b16decode(carts_str.endcode()))
-            # 用户从没有操作过cookie购物车
             else:
-                carts_dict = {}
-            # 判断要加入购物车的商品是否已经在购物车中,如有相同商品，累加求和，反之，直接赋值
+                return HttpResponseForbidden('cookie购物车数据不存在')
             if sku_id in carts_dict:
-                origin_count = carts_dict[sku_id]['count']
-                count += origin_count
-            carts_dict[sku_id] = {
+                carts_dict[sku_id] = {
+                    'count': count,
+                    'selected': selected,
+                }
+            else:
+                return HttpResponseForbidden('商品id不存在')
+            # 响应数据
+            cart_sku = {
+                'id': sku_id,
+                'name': sku.name,
                 'count': count,
                 'selected': selected,
+                'default_image': sku.default_image,
+                'price': str(sku.price),
+                'amount': str(sku.price * count),
             }
-            # 将字典转成bytes,再将bytes转成base64的bytes,最后将bytes转字符串
+            # cookie数据
             cookie_carts_str = base64.b64encode(pickle.dumps(carts_dict)).decode()
-            response = JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功'})
+            response = JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功','cart_sku':cart_sku})
             response.set_cookie('carts', cookie_carts_str, max_age=constants.CARTS_COOKIE_EXPIRES)
             return response
