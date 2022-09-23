@@ -169,9 +169,7 @@ let vm = new Vue(
                 let url = '/carts/selectall/';
                 axios.put(
                     url, {
-                        sku_id: this.carts[index].id,
-                        count: this.carts[index].count,
-                        selected: this.carts[index].selected,
+                        selected: selected,
                     }, {
                         headers: {
                             'X-CSRFToken': getCookie('csrftoken')
@@ -189,13 +187,17 @@ let vm = new Vue(
                             this.carts_temp = $.extend(true, {}, this.carts);
                         } else {
                             alert(response.data.errmsg);
-                            this.carts[index].selected = this.carts_temp[index].selected;
+                            for (let index in this.carts) {
+                                this.carts[index].selected = this.carts_temp[index].selected;
+                            }
                         }
                     }
                 ).catch(
                     error => {
                         console.log(error.response);
-                        this.carts[index].selected = this.carts_temp[index].selected;
+                        for (let index in this.carts) {
+                            this.carts[index].selected = this.carts_temp[index].selected;
+                        }
                     }
                 )
             },
