@@ -74,7 +74,6 @@ class CartsView(View):
         required = [sku_id, count]
         if not all(required):
             return HttpResponseForbidden('缺少必传参数')
-
         try:
             SKU.objects.get(id=sku_id)
         except SKU.DoesNotExist:
@@ -129,7 +128,6 @@ class CartsView(View):
         required = [sku_id, count]
         if not all(required):
             return HttpResponseForbidden('缺少必传参数')
-
         try:
             sku = SKU.objects.get(id=sku_id)
         except SKU.DoesNotExist:
@@ -195,6 +193,50 @@ class CartsView(View):
             }
             # cookie数据
             cookie_carts_str = base64.b64encode(pickle.dumps(carts_dict)).decode()
-            response = JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功','cart_sku':cart_sku})
+            response = JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功', 'cart_sku': cart_sku})
+            response.set_cookie('carts', cookie_carts_str, max_age=constants.CARTS_COOKIE_EXPIRES)
+            return response
+
+    def delete(self, request):
+        json_dict = json.loads(request.body.decode())
+        sku_id = json_dict.get('sku_id')
+
+        required = [sku_id, ]
+        if not all(required):
+            return HttpResponseForbidden('缺少必传参数')
+        try:
+            sku = SKU.objects.get(id=sku_id)
+        except SKU.DoesNotExist:
+            return HttpResponseForbidden('商品不存在')
+
+        user = request.user
+        if user.is_authenticated:
+            # 用户已登录，操作redis购物车
+            redis_conn = get_redis_connection('carts')
+            try:
+                int(redis_conn.hget(f'carts_{user.id}', sku_id).decode())
+            except Exception:
+                return HttpResponseForbidden('用户或商品id不存在')
+            redis_pipeline = redis_conn.pipeline()
+            redis_pipeline.hdel(f'carts_{user.id}', sku_id)
+            redis_pipeline.srem(f'selected_{user.id}', sku_id)
+            redis_pipeline.execute()
+
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '购物车删除商品成功'})
+        else:
+            # 用户未登录，操作cookie购物车
+            carts_str = request.COOKIES.get('cats')
+            if carts_str:
+                # 将cart_str转成bytes,再将bytes转成base64的bytes,最后将bytes转字典
+                carts_dict = pickle.loads(base64.b16decode(carts_str.endcode()))
+            else:
+                return HttpResponseForbidden('cookie购物车数据不存在')
+            if sku_id in carts_dict:
+                carts_dict.pop(sku_id)
+            else:
+                return HttpResponseForbidden('商品id不存在')
+            # cookie数据
+            cookie_carts_str = base64.b64encode(pickle.dumps(carts_dict)).decode()
+            response = JsonResponse({'code': RETCODE.OK, 'errmsg': '删除购物车成功'})
             response.set_cookie('carts', cookie_carts_str, max_age=constants.CARTS_COOKIE_EXPIRES)
             return response
