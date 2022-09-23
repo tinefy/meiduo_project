@@ -55,6 +55,8 @@ let vm = new Vue(
                 let count = 0;
                 if (this.carts[index].count < 5) {
                     count = this.carts[index].count + 1;
+                }else {
+                    count = 5;
                 }
                 this.update_count(index, count);
             },
@@ -62,6 +64,8 @@ let vm = new Vue(
                 let count = 0;
                 if (this.carts[index].count > 1) {
                     count = this.carts[index].count - 1;
+                }else {
+                    count = 1;
                 }
                 this.update_count(index, count);
             },
@@ -83,10 +87,10 @@ let vm = new Vue(
                     response => {
                         if (response.data.code === '0') {
                             this.carts[index].count = response.data.cart_sku.count;
-                            this.cart_total_count();
+                            this.calculate_total_count();
                             this.calculate_selected_total_and_amount();
                             this.carts_temp = $.extend(true, {}, this.carts);
-                        }else{
+                        } else {
                             alert(response.data.errmsg);
                             this.carts[index].count = this.carts_temp[index].count;
                         }

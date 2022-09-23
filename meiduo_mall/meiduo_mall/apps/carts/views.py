@@ -123,7 +123,9 @@ class CartsView(View):
         json_dict = json.loads(request.body.decode())
         sku_id = json_dict.get('sku_id')
         count = json_dict.get('count')
-        selected = json_dict.get('selected', True)
+        selected = bool(json_dict.get('selected'))
+        print(selected)
+        print(type(selected))
 
         required = [sku_id, count]
         if not all(required):
@@ -159,13 +161,13 @@ class CartsView(View):
                 'id': sku_id,
                 'name': sku.name,
                 'count': count,
-                'selected': selected,
+                'selected': str(selected),
                 'default_image': sku.default_image,
                 'price': str(sku.price),
                 'amount': str(sku.price * count),
             }
-
-            return JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功', 'cart_sku': cart_sku})
+            print(cart_sku)
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '修改购物车成功', 'cart_sku': cart_sku})
         else:
             # 用户未登录，操作cookie购物车
             carts_str = request.COOKIES.get('cats')
