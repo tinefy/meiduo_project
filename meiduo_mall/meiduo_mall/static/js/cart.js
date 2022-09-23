@@ -4,14 +4,22 @@ let vm = new Vue(
         delimiters: ['[[', ']]'],
         data: {
             username: getCookie('username'),
-            carts: carts,
+            carts: [],
+            carts_initial: [],
 
             total_count: 0,
             total_selected_count: 1,
             total_selected_amount: 1,
-            aaa:100,
+            aaa: 100,
         },
         methods: {
+            initialize_carts_data: function () {
+                this.carts = JSON.parse(JSON.stringify(carts));
+                for (let index in this.carts) {
+                    this.carts[index].selected = this.carts[index].selected === 'True';
+                }
+                this.carts_initial = JSON.parse(JSON.stringify(carts));
+            },
             calculate_total_count: function () {
                 this.total_count = 0;
                 for (let index in this.carts) {
@@ -27,9 +35,9 @@ let vm = new Vue(
                         this.total_selected_amount += this.carts[index].count * this.carts[index].price;
                     }
                 }
-                this.total_selected_amount=this.total_selected_amount.toFixed(2);
+                this.total_selected_amount = this.total_selected_amount.toFixed(2);
             },
-            update_selected:function (index){
+            update_selected: function (index) {
                 this.calculate_selected_total_and_amount();
             },
             check_sku_count: function () {
@@ -52,16 +60,15 @@ let vm = new Vue(
                 }
                 this.update_count();
             },
-            update_count:function (){
+            update_count: function () {
 
             },
         },
         mounted: function () {
+            this.initialize_carts_data();
             this.calculate_total_count();
             this.calculate_selected_total_and_amount();
         },
-        watch:{
-
-        },
+        watch: {},
     }
 )
