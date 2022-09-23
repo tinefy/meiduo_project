@@ -127,3 +127,64 @@ class CartsView(View):
             response = JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功'})
             response.set_cookie('carts', cookie_carts_str, max_age=constants.CARTS_COOKIE_EXPIRES)
             return response
+    def put(self, request):
+        json_dict = json.loads(request.body.decode())
+        sku_id = json_dict.get('sku_id')
+        count = json_dict.get('count')
+        selected = json_dict.get('selected', True)
+
+        required = [sku_id, count]
+        if not all(required):
+            return HttpResponseForbidden('缺少必传参数')
+
+        try:
+            SKU.objects.get(id=sku_id)
+        except SKU.DoesNotExist:
+            return HttpResponseForbidden('商品不存在')
+        try:
+            count = int(count)
+        except Exception:
+            return HttpResponseForbidden('参数count有误')
+        if not isinstance(selected, bool):
+            return HttpResponseForbidden('参数selected有误')
+
+        user = request.user
+        if user.is_authenticated:
+            # 用户已登录，操作redis购物车
+            redis_conn = get_redis_connection('carts')
+            try:
+                origin_count = int(redis_conn.hget(f'carts_{user.id}', sku_id).decode())
+            except Exception:
+                return HttpResponseForbidden('用户或商品id不存在')
+            if origin_count + count >= 0:
+                redis_pipeline = redis_conn.pipeline()
+                redis_pipeline.hincrby(f'carts_{user.id}', sku_id, count)
+                if selected:
+                    redis_pipeline.sadd(f'selected_{user.id}', sku_id)
+                redis_pipeline.execute()
+            else:
+                return JsonResponse({'code': RETCODE.PARAMERR, 'errmsg': '参数count有误'})
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功'})
+        else:
+            # 用户未登录，操作cookie购物车
+            carts_str = request.COOKIES.get('cats')
+            # 如果用户操作过cookie购物车
+            if carts_str:
+                # 将cart_str转成bytes,再将bytes转成base64的bytes,最后将bytes转字典
+                carts_dict = pickle.loads(base64.b16decode(carts_str.endcode()))
+            # 用户从没有操作过cookie购物车
+            else:
+                carts_dict = {}
+            # 判断要加入购物车的商品是否已经在购物车中,如有相同商品，累加求和，反之，直接赋值
+            if sku_id in carts_dict:
+                origin_count = carts_dict[sku_id]['count']
+                count += origin_count
+            carts_dict[sku_id] = {
+                'count': count,
+                'selected': selected,
+            }
+            # 将字典转成bytes,再将bytes转成base64的bytes,最后将bytes转字符串
+            cookie_carts_str = base64.b64encode(pickle.dumps(carts_dict)).decode()
+            response = JsonResponse({'code': RETCODE.OK, 'errmsg': '添加购物车成功'})
+            response.set_cookie('carts', cookie_carts_str, max_age=constants.CARTS_COOKIE_EXPIRES)
+            return response

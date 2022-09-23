@@ -87,9 +87,9 @@
     <li class="col05">[[ cart_sku.price ]]元</li>
     <li class="col06">
       <div class="num_add">
-        <a v-on:click="sku_count_minus" class="minus fl">-</a>
-        <input v-model="cart_sku.count" v-on:blur="check_sku_count" type="text" class="num_show fl">
-        <a v-on:click="sku_count_add" class="add fl">+</a>
+        <a v-on:click="sku_count_minus(index)" class="minus fl">-</a>
+        <input v-model="cart_sku.count" v-on:blur="check_sku_count(index)" type="text" class="num_show fl">
+        <a v-on:click="sku_count_add(index)" class="add fl">+</a>
       </div>
     </li>
     <li class="col07">[[ cart_sku.amount ]]元</li>
