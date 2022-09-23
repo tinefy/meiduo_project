@@ -5,7 +5,7 @@ let vm = new Vue(
         data: {
             username: getCookie('username'),
             carts: [],
-            carts_initial: [],
+            carts_temp: [],
 
             total_count: 0,
             total_selected_count: 1,
@@ -20,7 +20,7 @@ let vm = new Vue(
                     this.carts[index].selected = this.carts[index].selected === 'True';
                 }
                 // 手动记录购物车的初始值，用于更新购物车失败时还原商品数量
-                this.carts_initial = JSON.parse(JSON.stringify(carts));
+                this.carts_temp = JSON.parse(JSON.stringify(carts));
             },
             calculate_total_count: function () {
                 this.total_count = 0;
@@ -43,28 +43,60 @@ let vm = new Vue(
                 this.calculate_selected_total_and_amount();
             },
             check_sku_count: function (index) {
+                let count = 0;
                 if (this.carts[index].count > 5) {
-                    this.carts[index].count = 5;
+                    this.count = 5;
                 } else if (this.carts[index].count < 1) {
-                    this.carts[index].count = 1;
+                    this.count = 1;
                 }
-                this.update_count();
+                this.update_count(index, count);
             },
             sku_count_add: function (index) {
+                let count = 0;
                 if (this.carts[index].count < 5) {
-                    this.carts[index].count++;
+                    count = this.carts[index].count + 1;
                 }
-                this.update_count();
+                this.update_count(index, count);
             },
             sku_count_minus: function (index) {
+                let count = 0;
                 if (this.carts[index].count > 1) {
-                    this.carts[index].count--;
+                    count = this.carts[index].count - 1;
                 }
-                this.update_count();
+                this.update_count(index, count);
             },
-            update_count: function () {
+            update_count: function (index, count) {
                 let url = '/carts/';
-
+                axios.put(
+                    url, {
+                        sku_id: this.carts[index].id,
+                        count: count,
+                        selected: this.carts[index].selected,
+                    }, {
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        responseType: 'json',
+                        // withCredentials: true,
+                    }
+                ).then(
+                    response => {
+                        if (response.data.code === '0') {
+                            this.carts[index].count = response.data.cart_sku.count;
+                            this.cart_total_count();
+                            this.calculate_selected_total_and_amount();
+                            this.carts_temp = $.extend(true, {}, this.carts);
+                        }else{
+                            alert(response.data.errmsg);
+                            this.carts[index].count = this.carts_temp[index].count;
+                        }
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response);
+                        this.carts[index].count = this.carts_temp[index].count;
+                    }
+                )
             },
         },
         mounted: function () {
