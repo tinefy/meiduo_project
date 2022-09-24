@@ -35,10 +35,10 @@ class OrderSettlementView(LoginRequiredMixin, View):
 
         skus = SKU.objects.filter(id__in=carts_dict.keys())
         for sku in skus:
-            sku_count = carts_dict[sku.id]
-            sku_amount = sku.price * sku_count
-            total_count += sku_count
-            total_amount += sku_amount
+            sku.count = carts_dict[sku.id]
+            sku.amount = sku.price * sku.count
+            total_count += sku.count
+            total_amount += sku.amount
 
         freight = Decimal(constants.FREIGHT_COST)
 

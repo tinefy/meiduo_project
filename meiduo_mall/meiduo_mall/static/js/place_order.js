@@ -4,6 +4,9 @@ let vm = new Vue(
         delimiters: ['[[', ']]'],
         data: {
             username: getCookie('username'),
+
+            current_site:'',
+            payment_amount:'',
         },
     }
 )

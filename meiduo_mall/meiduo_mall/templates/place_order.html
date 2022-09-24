@@ -6,6 +6,11 @@
   <title>美多商城-订单确认</title>
   <link rel="stylesheet" type="text/css" href="{{ static('css/reset.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ static('css/main.css') }}">
+    <style type="text/css">
+    .address_list {
+      cursor: pointer;
+    }
+  </style>
   <script type="text/javascript" src="{{ static('js/vue-2.5.16.js') }}"></script>
   <script type="text/javascript" src="{{ static('js/axios-0.18.0.min.js') }}"></script>
 </head>
@@ -54,14 +59,17 @@
   <h3 class="common_title">确认收货地址</h3>
   <div class="common_list_con clearfix" id="get_site">
     <dl>
-      {% %}
+      {% if addresses %}
       <dt>寄送到：</dt>
-      {% %}
-      <dd><input type="radio" value="{{  }}">{{ }} {{ }} {{ }} （{{ }} 收） {{ }}</dd>
-      {% %}
-      {% %}
+      {% for address in addresses %}
+      <dd v-on:click="current_site={{ address.id }}" class="address_list">
+        <input type="radio" v-model="current_site" value="{{ address.id }}">
+        {{ address.province }} {{ address.city }} {{ address.district }} （{{ address.receiver }} 收） {{ address.mobile }}
+      </dd>
+      {% endfor %}
+      {% endif %}
     </dl>
-    <a href="{{  }}" class="edit_site">编辑收货地址</a>
+    <a href="{{ url('users:address') }}" class="edit_site">编辑收货地址</a>
   </div>
   <h3 class="common_title">支付方式</h3>
   <div class="common_list_con clearfix">
@@ -81,24 +89,24 @@
       <li class="col04">数量</li>
       <li class="col05">小计</li>
     </ul>
-    {% %}
+    {% for sku in skus %}
     <ul class="goods_list_td clearfix">
-      <li class="col01">{{ }}</li>
-      <li class="col02"><img src="{{  }}"></li>
-      <li class="col03">{{ }}</li>
+      <li class="col01">{{ loop.index }}</li>
+      <li class="col02"><img src="/{{ sku.default_image }}"></li>
+      <li class="col03">{{ sku.name }}</li>
       <li class="col04">台</li>
-      <li class="col05">{{ }}元</li>
-      <li class="col06">{{ }}</li>
-      <li class="col07">{{ }}元</li>
+      <li class="col05">{{ sku.price }}元</li>
+      <li class="col06">{{ sku.count }}</li>
+      <li class="col07">{{ sku.amount }}元</li>
     </ul>
-    {% %}
+    {% endfor %}
   </div>
   <h3 class="common_title">总金额结算</h3>
   <div class="common_list_con clearfix">
     <div class="settle_con">
-      <div class="total_goods_count">共<em>{{ }}</em>件商品，总金额<b>{{ }}元</b></div>
-      <div class="transit">运费：<b>{{ }}元</b></div>
-      <div class="total_pay">实付款：<b>{{ }}元</b></div>
+      <div class="total_goods_count">共<em>{{ total_count }}</em>件商品，总金额<b>{{ total_amount }}元</b></div>
+      <div class="transit">运费：<b>{{ freight }}元</b></div>
+      <div class="total_pay">实付款：<b>{{ payment_amount }}元</b></div>
     </div>
   </div>
   <div class="order_submit clearfix">
