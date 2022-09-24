@@ -1,0 +1,1 @@
+FREIGHT_COST = '10.00'
