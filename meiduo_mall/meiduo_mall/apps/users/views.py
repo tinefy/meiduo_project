@@ -16,11 +16,13 @@ from django.views import View
 
 from django_redis import get_redis_connection
 
+
 from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.apps.verifications.views import CheckSMSCodeView
 from meiduo_mall.utils.views import LoginRequiredJSONMixin
 
 from goods.models import SKU
+from carts.utils import cart_merge
 
 from . import constants
 from .models import Address
@@ -127,6 +129,7 @@ class LoginView(View):
         else:
             response = redirect(reverse('contents:index'))
         response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
+        response = cart_merge(request, user, response)
         return response
 
 

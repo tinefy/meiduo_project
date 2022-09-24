@@ -1,10 +1,11 @@
 import base64
-import json
 import pickle
+import json
 
 from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import render
 from django.views import View
+
 from django_redis import get_redis_connection
 
 from carts import constants
