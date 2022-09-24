@@ -9,6 +9,7 @@ from django.views import View
 from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
 from django.core import signing
 
+from carts.utils import cart_merge
 from meiduo_mall.apps.verifications.views import CheckSMSCodeView
 from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.utils.github_oauth import OAuthGitHub
@@ -94,4 +95,5 @@ class GitHubOAuthView(View):
         next_ = request.GET.get('state')
         response = redirect(next_)
         response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
+        response = cart_merge(request, user, response)
         return response

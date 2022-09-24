@@ -74,6 +74,7 @@ class RegisterView(View):
             login(request, user)
             response = redirect(reverse('contents:index'))
             response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
+            response = cart_merge(request, user, response)
             return response
 
 
