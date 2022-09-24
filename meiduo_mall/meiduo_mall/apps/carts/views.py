@@ -51,13 +51,9 @@ class CartsView(View):
         # 购物车渲染数据
         sku_ids = carts_dict.keys()
         skus = SKU.objects.filter(id__in=sku_ids)
-        # print(skus)
         cart_skus = []
         for sku in skus:
-            print(sku)
-            print(carts_dict)
             sku_count = carts_dict.get(sku.id).get('count')
-            print(sku_count)
             sku_dict = {
                 'id': sku.id,
                 'name': sku.name,
@@ -106,7 +102,6 @@ class CartsView(View):
         else:
             # 用户未登录，操作cookie购物车
             carts_str = request.COOKIES.get('carts')
-            print(carts_str)
             # 如果用户操作过cookie购物车
             if carts_str:
                 # 将cart_str转成bytes,再将bytes转成base64的bytes,最后将bytes转字典
