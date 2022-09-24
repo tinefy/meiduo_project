@@ -30,5 +30,6 @@ urlpatterns = [
     path('', include('oauth.urls', namespace='oauth')),
     path('', include('areas.urls', namespace='areas')),
     path('', include('carts.urls', namespace='carts')),
+    path('', include('orders.urls', namespace='orders')),
     re_path(r'(?P<fastdfs>^group\d+?/.*?$)', contents_views.FastDFSView.as_view()),
 ]
