@@ -5,6 +5,9 @@ let vm = new Vue(
         data: {
             username: getCookie('username'),
 
+            carts: [],
+            carts_total_count: 0,
+
             floors: {
                 f1_tabs: [
                     '时尚新品',
@@ -23,6 +26,33 @@ let vm = new Vue(
                 f2_tab: 1,
                 f3_tab: 1,
             },
+        },
+        methods: {
+            get_carts: function () {
+                let url = '/carts/simple/';
+                axios.get(
+                    url, {responseType: 'json'}
+                ).then(
+                    response => {
+                        if (response.data.code === '0') {
+                            this.carts = response.data.cart_skus;
+                            this.carts_total_count = 0;
+                            for (let index in this.carts) {
+                                this.carts_total_count += this.carts[index].count;
+                            }
+                        } else {
+                            alert(response.data.errmsg);
+                        }
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response);
+                    }
+                )
+            },
+        },
+        mounted: function () {
+            this.get_carts();
         },
     }
 )

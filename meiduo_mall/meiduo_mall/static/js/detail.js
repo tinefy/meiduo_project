@@ -7,6 +7,9 @@ let vm = new Vue(
 
             hot_skus: [],
 
+            carts: [],
+            carts_total_count: 0,
+
             category_id: category_id,
             sku_id: sku_id,
             sku_price: sku_price,
@@ -123,15 +126,39 @@ let vm = new Vue(
                     }
                 ).then(
                     response => {
-                        if (response.data.code == '0'){
+                        if (response.data.code == '0') {
                             alert('添加购物车成功');
-                        }else {
+
+                            this.get_carts();
+                        } else {
                             alert(response.data.errmsg);
                         }
                     }
                 ).catch(
                     error => {
                         console.log(error.response)
+                    }
+                )
+            },
+            get_carts: function () {
+                let url = '/carts/simple/';
+                axios.get(
+                    url, {responseType: 'json'}
+                ).then(
+                    response => {
+                        if (response.data.code === '0') {
+                            this.carts = response.data.cart_skus;
+                            this.carts_total_count=0;
+                            for (let index in this.carts) {
+                                this.carts_total_count += this.carts[index].count;
+                            }
+                        } else {
+                            alert(response.data.errmsg);
+                        }
+                    }
+                ).catch(
+                    error => {
+                        console.log(error.response);
                     }
                 )
             },
@@ -148,6 +175,7 @@ let vm = new Vue(
             this.get_hot_skus();
             this.post_browse_history();
             this.post_visit_count();
+            this.get_carts();
         },
     }
 )

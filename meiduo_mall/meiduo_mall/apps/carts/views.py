@@ -22,7 +22,7 @@ class CartsView(View):
     selected 	bool 	否 	是否勾选
     """
 
-    def get(self, request):
+    def get(self, request, simple=None):
         user = request.user
         if user.is_authenticated:
             # 用户已登录，查询redis购物车
@@ -65,10 +65,13 @@ class CartsView(View):
                 'amount': str(sku.price * sku_count),
             }
             cart_skus.append(sku_dict)
-        context = {
-            'cart_skus': cart_skus,
-        }
-        return render(request, 'cart.html', context=context)
+        if not simple:
+            context = {
+                'cart_skus': cart_skus,
+            }
+            return render(request, 'cart.html', context=context)
+        elif simple == 'simple':
+            return JsonResponse({'code': RETCODE.OK, 'errmsg': '简单购物车', 'cart_skus': cart_skus})
 
     def post(self, request):
         json_dict = json.loads(request.body.decode())
@@ -115,8 +118,8 @@ class CartsView(View):
                 carts_dict_[int(key)] = value
             carts_dict = carts_dict_
             # 判断要加入购物车的商品是否已经在购物车中,如有相同商品，累加求和，反之，直接赋值
-            if sku_id in carts_dict:
-                origin_count = carts_dict[sku_id]['count']
+            if int(sku_id) in carts_dict.keys():
+                origin_count = carts_dict[int(sku_id)]['count']
                 count += origin_count
             carts_dict[sku_id] = {
                 'count': count,
