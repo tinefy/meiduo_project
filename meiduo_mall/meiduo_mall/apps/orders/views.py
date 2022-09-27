@@ -173,3 +173,4 @@ class OrderCommitView(LoginRequiredJSONMixin, View):
         redis_pipeline.execute()
 
         return JsonResponse({'code': RETCODE.OK, 'errmsg': '下单成功', 'order_id': order.order_id})
+
