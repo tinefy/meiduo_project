@@ -137,9 +137,10 @@ class OrderCommitView(LoginRequiredJSONMixin, View):
 
                         # update() returns the number of rows matched
                         # which may not be equal to the number of rows updated if some rows already have the new value
-                        result=SKU.objects.filter(id=sku_id, stock=origin_stock).update(stock=new_stock, sales=new_sales)
+                        result = SKU.objects.filter(id=sku_id, stock=origin_stock).update(stock=new_stock,
+                                                                                          sales=new_sales)
                         # 如果下单失败，但是库存足够时，继续下单，直到下单成功或者库存不足为止
-                        if result==0:
+                        if result == 0:
                             continue
 
                         # 修改SPU销量
@@ -173,4 +174,3 @@ class OrderCommitView(LoginRequiredJSONMixin, View):
         redis_pipeline.execute()
 
         return JsonResponse({'code': RETCODE.OK, 'errmsg': '下单成功', 'order_id': order.order_id})
-
