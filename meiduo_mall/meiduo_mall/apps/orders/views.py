@@ -116,28 +116,48 @@ class OrderCommitView(LoginRequiredJSONMixin, View):
                 sku_ids = carts_dict.keys()
 
                 for sku_id in sku_ids:
-                    sku = SKU.objects.get(id=sku_id)
-                    sku_count = carts_dict[sku.id]
-                    # 判断SKU库存
-                    if sku_count > sku.stock:
-                        return JsonResponse({'code': RETCODE.STOCKERR, 'errmsg': '库存不足'})
-                    # SKU减少库存，增加销量
-                    sku.stock -= sku_count
-                    sku.sales += sku_count
-                    sku.save()
-                    # 修改SPU销量
-                    sku.spu.sales += sku_count
-                    sku.spu.save()
+                    # 使用乐观锁
+                    while True:
+                        sku = SKU.objects.get(id=sku_id)
 
-                    OrderGoods.objects.create(
-                        order=order,
-                        sku=sku,
-                        count=sku_count,
-                        price=sku.price,
-                    )
+                        # 读取原始库存
+                        origin_stock = sku.stock
+                        origin_sales = sku.sales
 
-                    order.total_count += sku_count
-                    order.total_amount += (sku.price * sku_count)
+                        sku_count = carts_dict[sku.id]
+                        # 判断SKU库存
+                        if sku_count > origin_stock:
+                            # 库存不足，下单失败事务回滚，并中止执行
+                            transaction.savepoint_rollback(transaction_save_id)
+                            return JsonResponse({'code': RETCODE.STOCKERR, 'errmsg': '库存不足'})
+
+                        # SKU减少库存，增加销量
+                        new_stock = origin_stock - sku_count
+                        new_sales = origin_sales + sku_count
+
+                        # update() returns the number of rows matched
+                        # which may not be equal to the number of rows updated if some rows already have the new value
+                        result=SKU.objects.filter(id=sku_id, stock=origin_stock).update(stock=new_stock, sales=new_sales)
+                        # 如果下单失败，但是库存足够时，继续下单，直到下单成功或者库存不足为止
+                        if result==0:
+                            continue
+
+                        # 修改SPU销量
+                        sku.spu.sales += sku_count
+                        sku.spu.save()
+
+                        OrderGoods.objects.create(
+                            order=order,
+                            sku=sku,
+                            count=sku_count,
+                            price=sku.price,
+                        )
+
+                        order.total_count += sku_count
+                        order.total_amount += (sku.price * sku_count)
+
+                        # 下单成功跳出循环
+                        break
                 order.total_amount += order.freight
                 order.save()
             except Exception as e:
