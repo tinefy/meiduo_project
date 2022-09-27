@@ -174,3 +174,19 @@ class OrderCommitView(LoginRequiredJSONMixin, View):
         redis_pipeline.execute()
 
         return JsonResponse({'code': RETCODE.OK, 'errmsg': '下单成功', 'order_id': order.order_id})
+
+
+class OrderSuccessView(LoginRequiredMixin, View):
+    """提交订单成功"""
+
+    def get(self, request):
+        order_id = request.GET.get('order_id')
+        payment_amount = request.GET.get('payment_amount')
+        pay_method = request.GET.get('pay_method')
+
+        context = {
+            'order_id': order_id,
+            'payment_amount': payment_amount,
+            'pay_method': pay_method
+        }
+        return render(request, 'order_success.html', context=context)
