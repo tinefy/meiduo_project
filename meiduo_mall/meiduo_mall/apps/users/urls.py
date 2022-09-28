@@ -1,4 +1,5 @@
 from django.urls import re_path
+
 from . import views
 
 app_name = 'users'
@@ -11,7 +12,6 @@ urlpatterns = [
     re_path(r'^login/$', views.LoginView.as_view(), name='login'),
     re_path(r'^logout/$', views.LogoutView.as_view(), name='logout'),
     re_path(r'^info/$', views.UserInfoView.as_view(), name='info'),
-    re_path(r'^info/password/$', views.UserInfoPasswordView.as_view(), name='password'),
     re_path(r'^emails/$', views.UserEmailsView.as_view(), name='emails'),
     re_path(r'^emails/verification/$', views.UserEmailsVerificationView.as_view(), name='emails_verification'),
     re_path(r'^address/$', views.UserAddressView.as_view(), name='address'),
@@ -26,5 +26,8 @@ urlpatterns = [
             name='address_set_default'),
     re_path(r'^address/(?P<address_id>\d+)/set/title/$', views.UserAddressSetTitleView.as_view(),
             name='address_set_default'),
+    re_path(r'^info/orders/(?P<page_num>\d+)/$', views.UserInfoOrderView.as_view(), name='orders'),
+    re_path(r'^info/orders/$', views.UserInfoOrderView.as_view(), name='orders_no_page_num'),
+    re_path(r'^info/password/$', views.UserInfoPasswordView.as_view(), name='password'),
     re_path(r'^browse_histories/$', views.UserBrowseHistory.as_view(), name='browse_histories'),
 ]

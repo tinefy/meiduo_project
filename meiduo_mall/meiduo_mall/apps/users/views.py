@@ -7,8 +7,9 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core import signing
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, HttpResponseBadRequest, \
-    HttpResponseServerError
+    HttpResponseServerError, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login, authenticate, logout
 from django.urls import reverse
@@ -16,13 +17,13 @@ from django.views import View
 
 from django_redis import get_redis_connection
 
-
 from meiduo_mall.utils.response_code import RETCODE
 from meiduo_mall.apps.verifications.views import CheckSMSCodeView
 from meiduo_mall.utils.views import LoginRequiredJSONMixin
 
 from goods.models import SKU
 from carts.utils import cart_merge
+from orders.models import OrderInfo
 
 from . import constants
 from .models import Address
@@ -157,61 +158,6 @@ class UserInfoView(LoginRequiredMixin, View):
             'email_active': request.user.email_active
         }
         return render(request, 'user_center_info.html', context=context)
-
-
-class UserInfoPasswordView(LoginRequiredJSONMixin, View):
-    def get(self, request):
-        context = {
-            'username': request.user.username,
-        }
-        return render(request, 'user_center_password.html', context=context)
-
-    def put(self, request):
-        password_data_dict = json.loads(request.body.decode())
-
-        for key, value in password_data_dict.items():
-            # 将key转为变量名并让key=value
-            globals()[key] = value
-
-        necessary = [old_password, new_password, new_password2]
-        if not all(necessary):
-            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '缺少必填信息'})
-        try:
-            request.user.check_password(old_password)
-        except Exception as e:
-            logger.error(e)
-            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '原密码错误'})
-        if not re.match(r'^[0-9A-Za-z]{8,20}$', new_password):
-            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '密码最少8位，最长20位'})
-        if new_password != new_password2:
-            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '两次输入的密码不一致'})
-
-        try:
-            request.user.set_password(new_password)
-            request.user.save()
-        except Exception as e:
-            logger.error(e)
-            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '修改密码失败'})
-
-        user = request.user
-        logout(request)
-        response = JsonResponse({'code': RETCODE.OK, 'errmsg': '成功修改密码！'})
-        login(request, user=user)
-
-        # if remembered != 'on':
-        #     request.session.set_expiry(0)
-        # else:
-        #     request.session.set_expiry(None)
-        # else:
-        #     response = redirect(reverse('contents:index'))
-        # response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
-
-        # 清理状态保持信息
-        # logout(request)
-        # response = redirect(reverse('users:login'))
-        # response.delete_cookie('username')
-
-        return response
 
 
 class UserEmailsView(LoginRequiredJSONMixin, View):
@@ -453,6 +399,95 @@ class UserAddressSetTitleView(LoginRequiredJSONMixin, View):
         else:
             title_dict = {'title': Address.objects.get(id=address_id).title}
             return JsonResponse({'code': RETCODE.OK, 'errmsg': '新标题为空，保持原地址标题', 'title': title_dict})
+
+
+class UserInfoOrderView(LoginRequiredMixin, View):
+    def get(self, request, page_num=1):
+        user = request.user
+        # 查询订单
+        orders = user.orderinfo_set.all().order_by('-create_time')
+        for order in orders:
+            # order新增实例属性，保存订单状态
+            order.status_name = OrderInfo.ORDER_STATUS_CHOICES[order.status - 1][1]
+            order.pay_method_name = OrderInfo.ORDER_STATUS_CHOICES[order.status - 1][1]
+            order.skus = []
+            order_goods_list = order.ordergoods_set.all()
+            for order_goods in order_goods_list:
+                sku = order_goods.sku
+                sku.count = order_goods.count
+                sku.amount = sku.price * sku.count
+                order.skus.append(sku)
+
+        # 分页
+        page_num = int(page_num)
+        if len(orders) > 0:
+            paginator = Paginator(orders, constants.ORDERS_LIST_LIMIT)
+            page_orders = paginator.page(page_num)
+            total_page = paginator.num_pages
+        else:
+            return HttpResponseNotFound('订单不存在')
+
+        context = {
+            'page_orders': page_orders,
+            'total_page': total_page,
+            'page_num': page_num,
+        }
+        return render(request, 'user_center_order.html', context=context)
+
+
+class UserInfoPasswordView(LoginRequiredJSONMixin, View):
+    def get(self, request):
+        context = {
+            'username': request.user.username,
+        }
+        return render(request, 'user_center_password.html', context=context)
+
+    def put(self, request):
+        password_data_dict = json.loads(request.body.decode())
+
+        for key, value in password_data_dict.items():
+            # 将key转为变量名并让key=value
+            globals()[key] = value
+
+        necessary = [old_password, new_password, new_password2]
+        if not all(necessary):
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '缺少必填信息'})
+        try:
+            request.user.check_password(old_password)
+        except Exception as e:
+            logger.error(e)
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '原密码错误'})
+        if not re.match(r'^[0-9A-Za-z]{8,20}$', new_password):
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '密码最少8位，最长20位'})
+        if new_password != new_password2:
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '两次输入的密码不一致'})
+
+        try:
+            request.user.set_password(new_password)
+            request.user.save()
+        except Exception as e:
+            logger.error(e)
+            return JsonResponse({'code': RETCODE.DBERR, 'errmsg': '修改密码失败'})
+
+        user = request.user
+        logout(request)
+        response = JsonResponse({'code': RETCODE.OK, 'errmsg': '成功修改密码！'})
+        login(request, user=user)
+
+        # if remembered != 'on':
+        #     request.session.set_expiry(0)
+        # else:
+        #     request.session.set_expiry(None)
+        # else:
+        #     response = redirect(reverse('contents:index'))
+        # response.set_cookie('username', user.username, max_age=3600 * 24 * 15)
+
+        # 清理状态保持信息
+        # logout(request)
+        # response = redirect(reverse('users:login'))
+        # response.delete_cookie('username')
+
+        return response
 
 
 class UserBrowseHistory(LoginRequiredJSONMixin, View):
